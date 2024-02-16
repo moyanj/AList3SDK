@@ -1,6 +1,6 @@
 # AList3SDK
 
-AList3SDK 是用于与 AList 服务集成和交互的官方 Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
+AList3SDK 是用于与 AList 服务集成和交互的 Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
 
 ## 安装
 
@@ -29,10 +29,10 @@ print('AList 服务查询结果:', list(response))
 
 ## 示例代码
 
-有关示例代码，请参阅我们的 [文档📄](https://github.com/AList3SDK/examples)。
+有关示例代码，请参阅我们的 [文档📄](https://alist3sdk.readthedocs.io/examples)。
 
 ## API 文档
-请参阅我们的 [文档📄](https://github.com/AList3SDK/examples)。
+请参阅我们的 [文档📄](https://alist3sdk.readthedocs.io)。
 
 
 ## 常见问题解答
