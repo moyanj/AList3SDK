@@ -49,17 +49,17 @@ class AList:
         return _urljoin(self.endpoint,path)
     def login(self, username: str, password: str, otp_code: str = None):
         '''
-        Sign in
         登录
-        Parameters:
-            username:str - User name for AList(AList的用户名)
-            password:str - Password for AList(AList的密码)
-            otp_code:str - OTP code
+       
+        Args:
+            username (str): AList的用户名
+            password (str): AList的密码
+            otp_code (str): OTP
+            
         Returns:
-            A Boolean value indicating whether the login was successful.
-            一个布尔值，代表是否登录成功。
-        Raises:
-            AuthenticationError: Login failed
+            (bool): 是否成功
+            
+            
         '''
         
         URL = _urljoin(self.endpoint, "/api/auth/login/hash")
@@ -83,15 +83,11 @@ class AList:
 
     def userInfo(self):
         '''
-        Get information about the currently logged on user.
         获取当前登录的用户的信息
-        Parameters:
-            Unused parameter
+       
         Returns:
-            A dictionary that contains information about the current user.
-            一个字典，包含了当前用户的信息。
-        Raises:
-            No.
+            (dict):一个字典，包含了当前用户的信息。
+        
         '''  
               
         URL = _urljoin(self.endpoint, "/api/me")
@@ -107,20 +103,18 @@ class AList:
         password: str = "",
     ):
         '''
-        Lists all files or folders in the specified directory.
         列出指定目录下的所有文件或文件夹。
-        Parameters:
-            path:str,AListFolder - Directories to be listed(需要列出的目录)
-            page:int = 1- Number of pages(页数)
-            per_page:int = 50 - Quantity per page(每页的数量)
-            refresh:bool = False - Whether to force a refresh(是否强制刷新)
-            password:str = '' - Directory Password(目录密码)
- 
+        
+        Args:
+            path (str,AListFolder): 需要列出的目录
+            page (int): 页数
+            per_page (int): 每页的数量
+            refresh (bool): 是否强制刷新
+            password (str): 目录密码
+            
         Returns:
-            A generator that is a file in a specified directory.
-            一个生成器，是指定目录下的文件。
-        Raises:
-            FileNotFoundError: The folder to be listed does not exist.
+            (generator):指定目录下的文件
+        
         '''
         
         URL = _urljoin(self.endpoint, '/api/fs/list')

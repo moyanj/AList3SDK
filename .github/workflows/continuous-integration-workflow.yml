@@ -4,9 +4,7 @@
 # action的名称
 name: Upload Python Package gotwo
 
-on:
-  # 当master分支有push时，触发action
-  push:
+on: push
 
 jobs:
   deploy:
