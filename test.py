@@ -1,7 +1,6 @@
-from alist import AList
+from alist import AList, AListUser
 
-app = AList("http://file.moyanjdc.top/")
-app.login("admin", "jdc20101217")
-
-app.remove("/百度网盘/1.txt")
+app = AListAdmin("http://127.0.0.1:5244/")
+adm = AListUser("admin", "jdc20101217")
+print(app.UserInfo())
 print(app.headers)

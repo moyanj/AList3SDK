@@ -2,7 +2,7 @@ class AListError(Exception):
     pass
 
 
-class AuthenticationError(ValueError):
+class AuthenticationError(AListError):
     pass
 
 
