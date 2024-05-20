@@ -3,7 +3,6 @@ import requests as _req
 
 class AListFile:
     def __init__(self, path, init):
-        print(init)
         self.path = path
         self.name = init["name"]
         self.provider = init["provider"]
