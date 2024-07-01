@@ -1,17 +1,19 @@
 # pylint:disable=W0707
-from hashlib import sha256 as _sha256
-import requests as _req
-from urllib.parse import urljoin as _urljoin
-import json as _json
-from sys import version_info as _version_info
-from platform import platform as _pf
-from os.path import join as _pathjoin
-from urllib.parse import quote as _quote
-from typing import Union as _Union
-from os.path import dirname as _dirname
-from os.path import basename as _basename
+import json
+import os
+from hashlib import sha256
+from platform import platform
+from sys import version_info
+from typing import Union
+from urllib.parse import quote
+from urllib.parse import urljoin
 
-from . import Error, file, folder, utils
+import requests
+
+from .error import ServerError, AuthenticationError
+from .file import AListFile
+from .folder import AListFolder
+from .utils import ToClass
 
 
 class AListUser:
@@ -46,12 +48,12 @@ class AList:
 
         # 构建UA
         ver = [
-            str(_version_info.major),
-            str(_version_info.minor),
-            str(_version_info.micro),
+            str(version_info.major),
+            str(version_info.minor),
+            str(version_info.micro),
         ]
         ver = ".".join(ver)
-        pf = _pf().split("-")
+        pf = platform().split("-")
 
         self.headers = {
             "User-Agent": f"AListSDK/1.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
@@ -59,26 +61,26 @@ class AList:
             "Authorization": "",
         }
 
-    def _isBadRequest(self, r, msg):
+    @classmethod
+    def _is_bad_request(cls, r, msg):
         # 是否为不好的请求
         try:
-            j = _json.loads(r.text)
-
-        except _json.JSONDecodeError:
-
+            j = json.loads(r.text)
+        except json.JSONDecodeError:
             raise ValueError("服务器返回数据不是JSON数据")
 
         if j["code"] != 200:
-            raise Error.ServerError(msg + ":" + j["message"])
+            raise ServerError(msg + ":" + j["message"])
 
-    def _getURL(self, path):
+    def _get_url(self, path):
         # 获取api端点
-        return _urljoin(self.endpoint, path)
+        return urljoin(self.endpoint, path)
 
-    def _parserJson(self, js):
-        return utils.ToClass(_json.loads(js))
+    @classmethod
+    def _parser_json(cls, js):
+        return ToClass(json.loads(js))
 
-    def Login(self, user: AListUser):
+    def login(self, user: AListUser):
         """
         登录
 
@@ -93,26 +95,26 @@ class AList:
         password = user.pwd
         username = user.un
         otp_code = user.oc
-        URL = self._getURL("/api/auth/login/hash")
+        url = self._get_url("/api/auth/login/hash")
 
         # 对密码进行sha256摘要
-        sha = _sha256()
+        sha = sha256()
         sha.update(password.encode())
         sha.update(b"-https://github.com/alist-org/alist")
-        sha256Password = sha.hexdigest()
+        sha256_password = sha.hexdigest()
         # 构建json数据
-        data = {"username": username, "password": sha256Password, "otp_code": otp_code}
-        data = _json.dumps(data)
+        data = {"username": username, "password": sha256_password, "otp_code": otp_code}
+        data = json.dumps(data)
 
-        r = _req.post(URL, headers=self.headers, data=data)
+        r = requests.post(url, headers=self.headers, data=data)
         # 处理返回数据
-        self._isBadRequest(r, "账号或密码错误")
+        self._is_bad_request(r, "账号或密码错误")
         # 保存
-        self.token = _json.loads(r.text)["data"]["token"]
+        self.token = json.loads(r.text)["data"]["token"]
         self.headers["Authorization"] = self.token
         return True
 
-    def UserInfo(self):
+    def user_info(self):
         """
         获取当前登录的用户的信息
 
@@ -121,17 +123,17 @@ class AList:
 
         """
 
-        URL = self._getURL("/api/me")
-        r = _req.get(URL, headers=self.headers)
-        return self._parserJson(r.text).data
+        url = self._get_url("/api/me")
+        r = requests.get(url, headers=self.headers)
+        return self._parser_json(r.text).data
 
-    def ListDir(
-        self,
-        path: _Union[str, folder.AListFolder],
-        page: int = 1,
-        per_page: int = 50,
-        refresh: bool = False,
-        password: str = "",
+    def list_dir(
+            self,
+            path: Union[str, AListFolder],
+            page: int = 1,
+            per_page: int = 50,
+            refresh: bool = False,
+            password: str = "",
     ):
         """
         列出指定目录下的所有文件或文件夹。
@@ -148,9 +150,9 @@ class AList:
 
         """
 
-        URL = self._getURL("/api/fs/list")
+        url = self._get_url("/api/fs/list")
 
-        data = _json.dumps(
+        data = json.dumps(
             {
                 "path": str(path),
                 "password": password,
@@ -159,16 +161,14 @@ class AList:
                 "refresh": refresh,
             }
         )
-        r = _req.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "上传失败")
+        r = requests.post(url, data=data, headers=self.headers)
+        self._is_bad_request(r, "上传失败")
 
-        for item in _json.loads(r.text)["data"]["content"]:
-            i = {"path": _pathjoin(str(path), item["name"]), "is_dir": item["is_dir"]}
-            yield utils.ToClass(i)
+        for item in json.loads(r.text)["data"]["content"]:
+            i = {"path": os.path.join(str(path), item["name"]), "is_dir": item["is_dir"]}
+            yield ToClass(i)
 
-    def open(
-        self, path: _Union[str, folder.AListFolder, file.AListFile], password: str = ""
-    ):
+    def open(self, path: Union[str, AListFolder, AListFile], password: str = ""):
         """
         打开文件/文件夹
 
@@ -183,18 +183,18 @@ class AList:
 
         """
 
-        URL = self._getURL("/api/fs/get")
+        url = self._get_url("/api/fs/get")
 
-        data = _json.dumps({"path": str(path), "password": password})
-        r = _req.post(URL, headers=self.headers, data=data)
+        data = json.dumps({"path": str(path), "password": password})
+        r = requests.post(url, headers=self.headers, data=data)
 
-        r_json = _json.loads(r.text)
+        r_json = json.loads(r.text)
         if r_json["data"]["is_dir"]:
-            return folder.AListFolder(str(path), r_json["data"])
+            return AListFolder(str(path), r_json["data"])
         else:
-            return file.AListFile(str(path), r_json["data"])
+            return AListFile(str(path), r_json["data"])
 
-    def Mkdir(self, path: str):
+    def mkdir(self, path: str):
         """
         创建文件夹
 
@@ -206,43 +206,43 @@ class AList:
 
 
         """
-        URL = self._getURL("/api/fs/mkdir")
-        data = _json.dumps({"path": path})
+        url = self._get_url("/api/fs/mkdir")
+        data = json.dumps({"path": path})
 
-        r = _req.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "创建失败")
+        r = requests.post(url, data=data, headers=self.headers)
+        self._is_bad_request(r, "创建失败")
 
         return True
 
-    def Upload(self, path: _Union[str, file.AListFile], local: str):
+    def upload(self, path: Union[str, AListFile], local: str):
         """
         上传文件
 
         Args:
             path (str, AListFile): 上传的路径
-            locel (str): 本地路径
+            local (str): 本地路径
 
         Returns:
             (bool): 是否成功
 
 
         """
-        URL = self._getURL("/api/fs/put")
+        url = self._get_url("/api/fs/put")
 
         files = open(local, "rb").read()
-        FilePath = _quote(str(path))
+        FilePath = quote(str(path))
 
         headers = self.headers.copy()
         headers["File-Path"] = FilePath
         headers["Content-Length"] = str(len(files))
         del headers["Content-Type"]
 
-        r = _req.put(URL, data=files, headers=headers)
-        self._isBadRequest(r, "上传失败")
+        r = requests.put(url, data=files, headers=headers)
+        self._is_bad_request(r, "上传失败")
 
         return True
 
-    def Rename(self, src: _Union[str, folder.AListFolder, file.AListFile], dst: str):
+    def rename(self, src: Union[str, AListFolder, AListFile], dst: str):
         """
         重命名
 
@@ -255,78 +255,76 @@ class AList:
 
 
         """
-        URL = self._getURL("/api/fs/rename")
+        url = self._get_url("/api/fs/rename")
 
-        data = _json.dumps({"path": str(src), "name": dst})
+        data = json.dumps({"path": str(src), "name": dst})
 
-        r = _req.post(URL, headers=self.headers, data=data)
-        self._isBadRequest(r, "重命名失败")
+        r = requests.post(url, headers=self.headers, data=data)
+        self._is_bad_request(r, "重命名失败")
         return True
 
-    def Remove(self, path: _Union[str, file.AListFile]):
-        URL = self._getURL("/api/fs/remove")
-        payload = _json.dumps(
-            {"names": [str(_basename(str(path)))], "dir": str(_dirname(str(path)))}
+    def remove(self, path: Union[str, AListFile]):
+        url = self._get_url("/api/fs/remove")
+        payload = json.dumps(
+            {"names": [str(os.path.basename(str(path)))], "dir": str(os.path.dirname(str(path)))}
         )
 
-        r = _req.post(URL, data=payload, headers=self.headers)
-        self._isBadRequest(r, "删除失败")
+        r = requests.post(url, data=payload, headers=self.headers)
+        self._is_bad_request(r, "删除失败")
         return True
 
-    def RemoveFolder(self, path: _Union[str, folder.AListFolder]):
-        URL = self._getURL("/api/fs/remove_empty_directory")
-        data = _json.dumps({"src_dir": str(path)})
-        r = _req.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "删除失败")
+    def remove_folder(self, path: Union[str, AListFolder]):
+        url = self._get_url("/api/fs/remove_empty_directory")
+        data = json.dumps({"src_dir": str(path)})
+        r = requests.post(url, data=data, headers=self.headers)
+        self._is_bad_request(r, "删除失败")
         return True
 
-    def Copy(
-        self, src: _Union[str, file.AListFile], dstDir: _Union[str, folder.AListFolder]
-    ):
-        URL = self._getURL("/api/fs/copy")
-        data = _json.dumps(
+    def copy(self, src: Union[str, AListFile], dst_dir: Union[str, AListFolder]):
+        url = self._get_url("/api/fs/copy")
+        data = json.dumps(
             {
-                "src_dir": _dirname(str(src)),
-                "dst_dir": str(dstDir),
-                "names": [_basename(str(src))],
+                "src_dir": os.path.dirname(str(src)),
+                "dst_dir": str(dst_dir),
+                "names": [os.path.basename(str(src))],
             }
         )
-        r = _req.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "复制失败")
+        r = requests.post(url, data=data, headers=self.headers)
+        self._is_bad_request(r, "复制失败")
         return True
 
-    def Move(
-        self, src: _Union[str, file.AListFile], dstDir: _Union[str, folder.AListFolder]
+    def move(
+            self, src: Union[str, AListFile], dst_dir: Union[str, AListFolder]
     ):
-        URL = self._getURL("/api/fs/move")
-        data = _json.dumps(
+        url = self._get_url("/api/fs/move")
+        data = json.dumps(
             {
-                "src_dir": _dirname(str(src)),
-                "dst_dir": str(dstDir),
-                "names": [_basename(str(src))],
+                "src_dir": os.path.dirname(str(src)),
+                "dst_dir": str(dst_dir),
+                "names": [os.path.basename(str(src))],
             }
         )
-        r = _req.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "移动失败")
+        r = requests.post(url, data=data, headers=self.headers)
+        self._is_bad_request(r, "移动失败")
         return True
 
-    def SiteConfig(self):
-        url = self._getURL("/api/public/settings")
-        r = _req.get(url, headers=self.headers)
-        self._isBadRequest(r, "AList配置信息获取失败")
-        return self._parserJson(r.text).data
+    def site_config(self):
+        url = self._get_url("/api/public/settings")
+        r = requests.get(url, headers=self.headers)
+        self._is_bad_request(r, "AList配置信息获取失败")
+        return self._parser_json(r.text).data
 
 
 class AListAdmin(AList):
     def __init__(self, user, endpoint):
         super().__init__(endpoint)
-        self.Login(user)
-        if self.UserInfo().id != 1:
-            raise Error.AuthenticationError("无权限")
+        self.login(user)
+        if self.user_info().id != 1:
+            raise AuthenticationError("无权限")
 
-    def ListMeta(self, page=None, per_page=None):
-        url = self._getURL("/api/admin/meta/list")
+    def list_meta(self, page=None, per_page=None):
+        url = self._get_url("/api/admin/meta/list")
         prams = {"page": page, "per_page": per_page}
-        r = _req.get(url, params=prams, headers=self.headers)
-        self._isBadRequest(r, "无法列出元数据")
-        return self._parserJson(r.text)
+        r = requests.get(url, params=prams, headers=self.headers)
+        self._is_bad_request(r, "无法列出元数据")
+        return self._parser_json(r.text)

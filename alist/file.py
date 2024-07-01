@@ -1,4 +1,4 @@
-import requests as _req
+import requests
 
 
 class AListFile:
@@ -25,9 +25,9 @@ class AListFile:
         pass
 
     def read(self):
-        return _req.get(self.url).content
+        return requests.get(self.url).content
 
     def save(self, path):
-        r = _req.get(self.url)
+        r = requests.get(self.url)
         with open(path, "wb") as f:
             f.write(r.content)

@@ -1,6 +1,5 @@
 class AListFolder:
     def __init__(self, path, init):
-        # print(init)
         self.path = path
         self.provider = init["provider"]
         self.size = init["size"]
