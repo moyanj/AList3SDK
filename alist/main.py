@@ -11,7 +11,7 @@ from typing import Union as _Union
 from os.path import dirname as _dirname
 from os.path import basename as _basename
 
-from . import Error, file, folder, utils
+from . import error, file, folder, utils
 
 
 class AListUser:
@@ -28,6 +28,9 @@ class AListUser:
         self.un = username
         self.pwd = password
         self.oc = otp_code
+
+    def dump(self, encrypt: bool = False):
+        pass
 
 
 class AList:
@@ -54,7 +57,7 @@ class AList:
         pf = _pf().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.1.2 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -66,10 +69,10 @@ class AList:
 
         except _json.JSONDecodeError:
 
-            raise ValueError("服务器返回数据不是JSON数据")
+            raise ValueError("服务器返回的数据不是JSON数据")
 
         if j["code"] != 200:
-            raise Error.ServerError(msg + ":" + j["message"])
+            raise error.ServerError(msg + ":" + j["message"])
 
     def _getURL(self, path):
         # 获取api端点
@@ -322,7 +325,7 @@ class AListAdmin(AList):
         super().__init__(endpoint)
         self.Login(user)
         if self.UserInfo().id != 1:
-            raise Error.AuthenticationError("无权限")
+            raise error.AuthenticationError("无权限")
 
     def ListMeta(self, page=None, per_page=None):
         url = self._getURL("/api/admin/meta/list")
