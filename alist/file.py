@@ -31,3 +31,6 @@ class AListFile:
         r = _req.get(self.url)
         with open(path, "wb") as f:
             f.write(r.content)
+    
+    def close(self):
+        pass
