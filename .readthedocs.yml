@@ -16,4 +16,8 @@ mkdocs:
 # Optionally declare the Python requirements required to build your docs
 python:
   install:
+<<<<<<< HEAD
   - requirements: requirements.doc.txt
+=======
+  - requirements: requirements.txt
+>>>>>>> 16f97cb (增加readthedocs)
