@@ -9,13 +9,13 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../folder/">
       
       
-        <link rel="next" href="../examples/">
+        <link rel="next" href="../utils/">
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
     
     
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -43,9 +43,9 @@
       
     
     
-      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="页眉">
-    <a href=".." title="AList3SDK" class="md-header__button md-logo" aria-label="AList3SDK" data-md-component="logo">
+    <a href="../.." title="AList3SDK" class="md-header__button md-logo" aria-label="AList3SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -150,7 +150,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="AList3SDK" class="md-nav__button md-logo" aria-label="AList3SDK" data-md-component="logo">
+    <a href="../.." title="AList3SDK" class="md-nav__button md-logo" aria-label="AList3SDK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
@@ -180,7 +180,7 @@
   
   
     <li class="md-nav__item">
-      <a href=".." class="md-nav__link">
+      <a href="../.." class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -229,6 +229,48 @@
             Apis
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../file/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    文件类
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../folder/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    文件夹类
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -302,6 +344,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#alist.main.AList.Copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alist.main.AList.ListDir" class="md-nav__link">
     <span class="md-ellipsis">
       ListDir
@@ -329,9 +380,54 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#alist.main.AList.Move" class="md-nav__link">
+    <span class="md-ellipsis">
+      Move
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.Remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.RemoveFolder" class="md-nav__link">
+    <span class="md-ellipsis">
+      RemoveFolder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alist.main.AList.Rename" class="md-nav__link">
     <span class="md-ellipsis">
       Rename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.SiteConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      SiteConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.Test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test
     </span>
   </a>
   
@@ -379,6 +475,48 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin" class="md-nav__link">
+    <span class="md-ellipsis">
+      AListAdmin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AListAdmin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.GetMeta" class="md-nav__link">
+    <span class="md-ellipsis">
+      GetMeta
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.ListMeta" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListMeta
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#alist.main.AListUser" class="md-nav__link">
     <span class="md-ellipsis">
       AListUser
@@ -406,6 +544,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    工具类
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -460,7 +619,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../examples/" class="md-nav__link">
+      <a href="../../examples/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -527,6 +686,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#alist.main.AList.Copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Copy
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alist.main.AList.ListDir" class="md-nav__link">
     <span class="md-ellipsis">
       ListDir
@@ -554,9 +722,54 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#alist.main.AList.Move" class="md-nav__link">
+    <span class="md-ellipsis">
+      Move
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.Remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remove
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.RemoveFolder" class="md-nav__link">
+    <span class="md-ellipsis">
+      RemoveFolder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#alist.main.AList.Rename" class="md-nav__link">
     <span class="md-ellipsis">
       Rename
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.SiteConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      SiteConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AList.Test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test
     </span>
   </a>
   
@@ -593,6 +806,48 @@
   <a href="#alist.main.AList.open" class="md-nav__link">
     <span class="md-ellipsis">
       open
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin" class="md-nav__link">
+    <span class="md-ellipsis">
+      AListAdmin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AListAdmin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.GetMeta" class="md-nav__link">
+    <span class="md-ellipsis">
+      GetMeta
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.ListMeta" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListMeta
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alist.main.AListAdmin.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
     </span>
   </a>
   
@@ -680,6 +935,8 @@
     <div class="doc doc-contents ">
 
 
+      <p>AList的SDK，此为主类。</p>
+
 
 
 
@@ -692,6 +949,89 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AList.Copy" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Copy</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dstDir</span><span class="p">)</span></code>
+
+<a href="#alist.main.AList.Copy" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>复制文件</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>src</code></td>
+            <td>
+                  <code>(str, <span title="alist.file.AListFile">AListFile</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>源文件</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dstDir</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>要复制到的路径</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否成功</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -822,7 +1162,7 @@
 
 
 <h3 id="alist.main.AList.Login" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Login</span><span class="p">(</span><span class="n">user</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">Login</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">otp_code</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span></code>
 
 <a href="#alist.main.AList.Login" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -959,6 +1299,227 @@
 <div class="doc doc-object doc-function">
 
 
+<h3 id="alist.main.AList.Move" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Move</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dstDir</span><span class="p">)</span></code>
+
+<a href="#alist.main.AList.Move" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>移动文件</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>src</code></td>
+            <td>
+                  <code>(str, <span title="alist.file.AListFile">AListFile</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>源文件</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>dstDir</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>要移动到的路径</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否成功</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AList.Remove" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+
+<a href="#alist.main.AList.Remove" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>删除</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>path</code></td>
+            <td>
+                  <code>(str, <span title="alist.file.AListFile">AListFile</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>要删除的文件</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否成功</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AList.RemoveFolder" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">RemoveFolder</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></code>
+
+<a href="#alist.main.AList.RemoveFolder" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>删除文件夹(需为空)</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>src</code></td>
+            <td>
+                  <code>(str, <span title="alist.folder.AListFolder">AListFolder</span>)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>文件夹路径</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否成功</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="alist.main.AList.Rename" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">Rename</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span></code>
 
@@ -1029,6 +1590,86 @@
             <td>
               <div class="doc-md-description">
                 <p>是否成功</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AList.SiteConfig" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">SiteConfig</span><span class="p">()</span></code>
+
+<a href="#alist.main.AList.SiteConfig" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>获取公开站点配置</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>ToClass</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>配置</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AList.Test" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">Test</span><span class="p">()</span></code>
+
+<a href="#alist.main.AList.Test" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>测试服务器可用性</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否可用</p>
               </div>
             </td>
           </tr>
@@ -1173,7 +1814,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>AList的SDK，此为主类。</p>
+      <p>初始化</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1199,6 +1840,20 @@
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>test</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否测试服务器可用性</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
             </td>
           </tr>
       </tbody>
@@ -1313,6 +1968,236 @@
 
 
 
+<h2 id="alist.main.AListAdmin" class="doc doc-heading">
+            <code>AListAdmin</code>
+
+
+<a href="#alist.main.AListAdmin" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="alist.main.AList" href="#alist.main.AList">AList</a></code></p>
+
+
+      <p>管理员操作
+(继承于AList类)</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AListAdmin.GetMeta" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">GetMeta</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></code>
+
+<a href="#alist.main.AListAdmin.GetMeta" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>获取元数据</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>idx</code></td>
+            <td>
+                  <code>int) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>元数据id</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="return" open>
+  <summary>Return</summary>
+  <p>(ToClass) 数据</p>
+</details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AListAdmin.ListMeta" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">ListMeta</span><span class="p">(</span><span class="n">page</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">per_page</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+<a href="#alist.main.AListAdmin.ListMeta" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>列出元数据</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>page</code></td>
+            <td>
+                  <code>int) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>页数</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>per_page</code></td>
+            <td>
+                  <code>int) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>每页的数量</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="return" open>
+  <summary>Return</summary>
+  <p>(ToClass) 数据</p>
+</details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="alist.main.AListAdmin.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
+
+<a href="#alist.main.AListAdmin.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+      <p>初始化</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>user</code></td>
+            <td>
+                  <code>AListUser) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>用户</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>endpoint</code></td>
+            <td>
+                  <code>str) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>api端点</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>test</code></td>
+            <td>
+                  <code>bool) </code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>是否测试服务器</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="alist.main.AListUser" class="doc doc-heading">
             <code>AListUser</code>
 
@@ -1322,6 +2207,8 @@
 
     <div class="doc doc-contents ">
 
+
+      <p>AList用户类</p>
 
 
 
@@ -1340,71 +2227,18 @@
 
 
 <h3 id="alist.main.AListUser.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">otp_code</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">rawpwd</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">pwd</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#alist.main.AListUser.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
 
 
     <div class="doc doc-contents ">
 
-      <p>AList用户类</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>username</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>AList的用户名</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>password</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>AList的密码</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>otp_code</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>OTP</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+      <p>初始化
+Args:
+    username (str): AList的用户名
+    rawpwd (str): AList的密码(明文)
+    pwd (str): AList的密码(密文)</p>
 
     </div>
 
@@ -1472,10 +2306,10 @@
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
+      <script src="../../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
       
     
   </body>
