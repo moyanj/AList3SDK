@@ -17,33 +17,39 @@ from . import error, file, folder, utils
 
 
 class AListUser:
-    def __init__(self, username: str, password: str='', otp_code=None):
+    '''
+    AList用户类
+    '''
+   
+    def __init__(self, username: str, rawpwd: str='', pwd=None):
         """
-        AList用户类
-
+        初始化
         Args:
             username (str): AList的用户名
-            password (str): AList的密码
-            otp_code (str): OTP
+            rawpwd (str): AList的密码(明文)
+            pwd (str): AList的密码(密文)
 
         """
         self.un = username
-        self.rawpwd = password
-        self.pwd = ''
-        self.oc = otp_code
         
-        sha = hashlib.sha256()
-        sha.update(self.rawpwd.encode())
-        sha.update(b"-https://github.com/alist-org/alist")
-        self.pwd = sha.hexdigest()
-        
-
+        if pwd:
+            self.pwd = pwd
+            self.rawpwd = None
+        else:
+            self.rawpwd = rawpwd
+            self.pwd = ''
+            sha = hashlib.sha256()
+            sha.update(self.rawpwd.encode())
+            sha.update(b"-https://github.com/alist-org/alist")
+            self.pwd = sha.hexdigest()
+            
     def dump(self,fp, rawpwd=False):
+        
         data = {
             'username':base64.b64encode(self.un.encode()),
             'pwd':base64.b64encode(self.pwd.encode())
         }
-        if rawpwd:
+        if rawpwd and self.rawpwd:
             warnings.warn('保存明文密码至文件是不安全的',error.SecurityWarning)
             data['raw'] = base64.b64encode(self.rawpwd.encode())
         
@@ -54,20 +60,50 @@ class AListUser:
             'username':base64.b64encode(self.un.encode()),
             'pwd':base64.b64encode(self.pwd.encode())
         }
-        if rawpwd:
+        if rawpwd and self.rawpwd:
             warnings.warn('保存明文密码至文件是不安全的',error.SecurityWarning)
             data['raw'] = base64.b64encode(self.rawpwd.encode())
         
         return pickle.dumps(data)
+    
+    @staticmethod
+    def load(fp):
+        data = pickle.load(fp)
+        un = base64.b64decode(data['username']).decode()
+        pwd = base64.b64decode(data['pwd']).decode()
+        raw = None
+        if 'raw' in data:
+            raw = base64.b64decode(data['raw']).decode()
+        return AListUser(un,pwd,raw)
         
-
+        
+    @staticmethod
+    def loads(byte):
+        data = pickle.loads(byte)
+        un = base64.b64decode(data['username']).decode()
+        pwd = base64.b64decode(data['pwd']).decode()
+        raw = None
+        if 'raw' in data:
+            raw = base64.b64decode(data['raw']).decode()
+        return AListUser(un,pwd,raw)
+    
+    def __str__(self):
+        return f'AListUser({self.un})'
+        
+    def __repr__(self):
+        return self.__str__()
+        
 class AList:
-    def __init__(self, endpoint: str, test=True):
+    '''
+    AList的SDK，此为主类。
+    '''
+    def __init__(self, endpoint: str, test:bool=True):
         """
-        AList的SDK，此为主类。
-
+        初始化
+        
         Args:
             endpoint (str):AList地址
+            test (bool):是否测试服务器可用性
         """
         if "http" not in endpoint:
             raise ValueError(endpoint + "不是有效的uri")
@@ -113,6 +149,13 @@ class AList:
         return utils.ToClass(json.loads(js))
     
     def Test(self):
+        '''
+        测试服务器可用性
+        
+        Returns:
+            (bool): 是否可用
+        
+        '''
         try:
             res = requests.get(self._getURL('/ping'),headers=self.headers)
         except:
@@ -122,7 +165,7 @@ class AList:
             return False
         return True
             
-    def Login(self, user: AListUser):
+    def Login(self, user: AListUser, otp_code:str=''):
         """
         登录
 
@@ -132,11 +175,10 @@ class AList:
         Returns:
             (bool): 是否成功
 
-
         """
         password = user.pwd
         username = user.un
-        otp_code = user.oc
+        
         URL = self._getURL("/api/auth/login/hash")
 
         # 构建json数据
@@ -264,7 +306,6 @@ class AList:
         Returns:
             (bool): 是否成功
 
-
         """
         URL = self._getURL("/api/fs/put")
 
@@ -303,6 +344,18 @@ class AList:
         return True
 
     def Remove(self, path: Union[str, file.AListFile]):
+        """
+        删除
+
+        Args:
+            path (str, AListFile): 要删除的文件
+
+        Returns:
+            (bool): 是否成功
+
+
+        """
+
         URL = self._getURL("/api/fs/remove")
         payload = json.dumps(
             {"names": [str(os.path.basename(str(path)))], "dir": str(os.path.dirname(str(path)))}
@@ -313,6 +366,18 @@ class AList:
         return True
 
     def RemoveFolder(self, path: Union[str, folder.AListFolder]):
+        """
+        删除文件夹(需为空)
+
+        Args:
+            src (str, AListFolder): 文件夹路径
+            
+        Returns:
+            (bool): 是否成功
+
+
+        """
+
         URL = self._getURL("/api/fs/remove_empty_directory")
         data = json.dumps({"src_dir": str(path)})
         r = requests.post(URL, data=data, headers=self.headers)
@@ -322,6 +387,18 @@ class AList:
     def Copy(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
     ):
+        """
+        复制文件
+
+        Args:
+            src (str, AListFile): 源文件
+            dstDir (str): 要复制到的路径
+
+        Returns:
+            (bool): 是否成功
+
+
+        """
         URL = self._getURL("/api/fs/copy")
         data = json.dumps(
             {
@@ -337,6 +414,19 @@ class AList:
     def Move(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
     ):
+        """
+        移动文件
+
+        Args:
+            src (str, AListFile): 源文件
+            dstDir (str): 要移动到的路径
+
+        Returns:
+            (bool): 是否成功
+
+
+        """
+
         URL = self._getURL("/api/fs/move")
         data = json.dumps(
             {
@@ -350,6 +440,15 @@ class AList:
         return True
 
     def SiteConfig(self):
+        """
+        获取公开站点配置
+        
+        Returns:
+            (ToClass): 配置
+
+
+        """
+
         url = self._getURL("/api/public/settings")
         r = requests.get(url, headers=self.headers)
         self._isBadRequest(r, "AList配置信息获取失败")
@@ -357,21 +456,56 @@ class AList:
 
 
 class AListAdmin(AList):
-    def __init__(self, user, endpoint):
-        super().__init__(endpoint)
+    '''
+    管理员操作
+    (继承于AList类)
+ 
+    '''
+    def __init__(self, user:AListUser, endpoint:str, test:bool = True):
+        '''
+        初始化
+        
+        Args:
+            user (AListUser) : 用户
+            endpoint (str) : api端点
+            test (bool) : 是否测试服务器
+        '''
+        super().__init__(endpoint, )
         self.Login(user)
         if self.UserInfo().id != 1:
             raise error.AuthenticationError("无权限")
 
-    def ListMeta(self, page=None, per_page=None):
+    def ListMeta(self, page:int=None, per_page=None):
+        '''
+        列出元数据
+        
+        Args:
+            page (int) : 页数
+            per_page (int) : 每页的数量
+            
+        Return:
+            (ToClass) 数据
+        '''
+        
         url = self._getURL("/api/admin/meta/list")
         prams = {"page": page, "per_page": per_page}
         r = requests.get(url, params=prams, headers=self.headers)
         self._isBadRequest(r, "无法列出元数据")
-        return self._parserJson(r.text)
+        return self._parserJson(r.text).data
     
     def GetMeta(self, idx):
+        '''
+        获取元数据
+        
+        Args:
+            idx (int) : 元数据id
+            
+        Return:
+            (ToClass) 数据
+        '''
+        
         url = self._getURL('/api/admin/meta/get')
         r = requests.get(url, params={'id':idx},headers=self.headers)
         self._isBadRequest(r, '无法找到该元数据')
+        return self._parserJson(r.text).data
 

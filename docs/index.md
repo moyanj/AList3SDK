@@ -1,6 +1,8 @@
 # AList3SDK
+[!WARNING]
+本SDK已发生重大更新，完全不兼容上一个版本(v1.0)
 
-AList3SDK 是用于与 AList 服务集成和交互的Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
+AList3SDK 是用于与 AList 服务集成和交互的 Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
 
 ## 安装
 
@@ -15,13 +17,14 @@ pip install alist3
 使用 AList3SDK，您可以轻松地与 AList 服务进行交互。以下是一个快速示例，演示如何使用 AList3SDK 查询 AList 服务：
 
 ```python
-from alist import AList
+from alist import AList, AListUser
 
 # 初始化 AList3SDK 客户端
-client = AList("<your-server-url>")
+user = AListUser("<your-user-name>","<your-password>")
+alist = AList("<your-server-url>")
 
 # 登录 AList 服务
-client.login("<your-user-name>","<your-password>")
+client.login(user)
 response = client.listdir("/")
 # 处理响应
 print('AList 服务查询结果:', list(response))
@@ -29,9 +32,10 @@ print('AList 服务查询结果:', list(response))
 
 ## 示例代码
 
-[在此查看](examples/index.md)
+有关示例代码，请参阅我们的 [文档📄](https://alist3sdk.readthedocs.io/examples)。
+
 ## API 文档
-[在此查看](apis/index.md)。
+请参阅我们的 [文档📄](https://alist3sdk.readthedocs.io)。
 
 
 ## 常见问题解答
@@ -45,4 +49,7 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 
 ## 版本历史
 
-- 1.0.0 (2024-01-01): 初始版本发布。
+- 1.0.0 (2024-02-16): 初始版本发布。
+- 1.1 (2024-05-10) : 改了一大堆东西
+- 1.1.1 (2024-05-20)： 修改文档与修复bug
+- 1.1.2 (2024-07-04)：适配部分admin操作,添加一多线程下载器
