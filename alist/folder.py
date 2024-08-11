@@ -1,6 +1,17 @@
 class AListFolder:
-    def __init__(self, path, init):
-        # print(init)
+    '''
+    AList文件夹
+    '''
+    def __init__(self, path:str, init:dict):
+        '''
+        初始化
+        
+        Args:
+            path (str):文件夹路径
+            init (dict):初始化字典
+            
+        
+        '''
         self.path = path
         self.provider = init["provider"]
         self.size = init["size"]

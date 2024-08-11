@@ -24,10 +24,11 @@ class AListUser:
     def __init__(self, username: str, rawpwd: str='', pwd=None):
         """
         初始化
+        
         Args:
-            username (str): AList的用户名
-            rawpwd (str): AList的密码(明文)
-            pwd (str): AList的密码(密文)
+            username (str):AList的用户名
+            rawpwd (str):AList的密码(明文)
+            pwd (str):AList的密码(密文)
 
         """
         self.un = username
@@ -44,6 +45,14 @@ class AListUser:
             self.pwd = sha.hexdigest()
             
     def dump(self,fp, rawpwd=False):
+        """
+        保存
+        
+        Args:
+            fp (文件对象):将要保存的文件
+            rawpwd (bool):保存明文密码
+            
+        """
         
         data = {
             'username':base64.b64encode(self.un.encode()),
@@ -56,6 +65,14 @@ class AListUser:
         pickle.dump(data,fp)
     
     def dumps(self, rawpwd=False):
+        """
+        保存(返回二进制)
+        
+        Args:
+            rawpwd (bool):保存明文密码
+            
+        """
+        
         data = {
             'username':base64.b64encode(self.un.encode()),
             'pwd':base64.b64encode(self.pwd.encode())
@@ -68,6 +85,14 @@ class AListUser:
     
     @staticmethod
     def load(fp):
+        """
+        加载
+        
+        Args:
+            fp (文件对象):将要加载的文件
+            
+        """
+        
         data = pickle.load(fp)
         un = base64.b64decode(data['username']).decode()
         pwd = base64.b64decode(data['pwd']).decode()
@@ -79,6 +104,14 @@ class AListUser:
         
     @staticmethod
     def loads(byte):
+        """
+        加载(从字节)
+        
+        Args:
+            byte (bytes): 将要加载的字节
+            
+        """
+        
         data = pickle.loads(byte)
         un = base64.b64decode(data['username']).decode()
         pwd = base64.b64decode(data['pwd']).decode()
@@ -121,7 +154,7 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.1.3 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.1.4 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -301,7 +334,7 @@ class AList:
 
         Args:
             path (str, AListFile): 上传的路径
-            locel (str): 本地路径
+            local (str): 本地路径
 
         Returns:
             (bool): 是否成功
@@ -370,7 +403,7 @@ class AList:
         删除文件夹(需为空)
 
         Args:
-            src (str, AListFolder): 文件夹路径
+            path (str, AListFolder): 文件夹路径
             
         Returns:
             (bool): 是否成功

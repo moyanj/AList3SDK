@@ -5,7 +5,6 @@ class AListError(Exception):
 class AuthenticationError(AListError):
     pass
 
-
 class ServerError(AListError):
     pass
 
