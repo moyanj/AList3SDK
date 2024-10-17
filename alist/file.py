@@ -11,6 +11,8 @@ class AListFile:
         self.created = init["created"]
         self.url = init["raw_url"]
         self.sign = init["sign"]
+        self.content = None
+        self.position = 0  # 文件读取位置
 
     def __len__(self):
         return self.size
@@ -24,13 +26,41 @@ class AListFile:
     def __exit__(self, exc_type, exc_value, exc_tb):
         pass
 
-    def read(self):
-        return _req.get(self.url).content
+    def download(self):
+        r = _req.get(self.url)
+        self.content = r.content
+
+    def read(self, n=-1):
+        if self.content is None:
+            self.download()
+        
+        if n == -1:
+            data = self.content[self.position:]
+            self.position = self.size  # 移动到文件末尾
+            return data
+        else:
+            end_position = min(self.position + n, self.size)
+            data = self.content[self.position:end_position]
+            self.position = end_position
+            return data
+
+    def seek(self, offset, whence=0):
+        if whence == 0:
+            self.position = offset
+        elif whence == 1:
+            self.position += offset
+        elif whence == 2:
+            self.position = max(0, self.size + offset)  # 防止移动到文件末尾之后
+
+        # 确保位置不会超出文件大小
+        self.position = min(self.position, self.size)
 
     def save(self, path):
-        r = _req.get(self.url)
+        if self.content is None:
+            r = _req.get(self.url)
+            self.content = r.content
         with open(path, "wb") as f:
-            f.write(r.content)
+            f.write(self.content)
     
     def close(self):
         pass
