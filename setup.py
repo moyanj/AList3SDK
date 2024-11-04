@@ -3,7 +3,7 @@ import time
 
 setup(
     name="alist3",
-    version="1.1.4",
+    version="1.2.0",
     description="AListV3 PythonSDK",
     author="MoYan",
     packages=find_packages(),
