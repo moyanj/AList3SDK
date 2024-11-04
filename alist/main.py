@@ -181,7 +181,7 @@ class AList:
     def _parserJson(self, js):
         return utils.ToClass(json.loads(js))
     
-    def Test(self):
+    def test(self):
         '''
         测试服务器可用性
         
@@ -197,8 +197,11 @@ class AList:
         if res.text != 'pong':
             return False
         return True
+
+    def Test(self):
+        warnings.warn('请使用test函数，而不是Test,我们将在2.0.0弃用它',DeprecationWarning)
             
-    def Login(self, user: AListUser, otp_code:str=''):
+    def login(self, user: AListUser, otp_code:str=''):
         """
         登录
 
@@ -226,7 +229,20 @@ class AList:
         self.headers["Authorization"] = self.token
         return True
 
-    def UserInfo(self):
+    def Login(self, *args, **kwargs):
+        """
+        登录
+
+        Args:
+            user (AListUser): AList用户
+
+        Returns:
+            (bool): 是否成功
+
+        """
+        warnings.warn('请使用login函数，而不是Login,我们将在2.0.0弃用它',DeprecationWarning)
+
+    def user_info(self):
         """
         获取当前登录的用户的信息
 
@@ -239,7 +255,10 @@ class AList:
         r = requests.get(URL, headers=self.headers)
         return self._parserJson(r.text).data
 
-    def ListDir(
+    def UserInfo(self):
+        warnings.warn('请使用user_info函数，而不是UserInfo,我们将在2.0.0弃用它',DeprecationWarning)
+
+    def list(
         self,
         path: Union[str, folder.AListFolder],
         page: int = 1,
@@ -279,6 +298,9 @@ class AList:
         for item in json.loads(r.text)["data"]["content"]:
             i = {"path": os.path.join(str(path), item["name"]), "is_dir": item["is_dir"]}
             yield utils.ToClass(i)
+
+    def ListDir(self):
+        warnings.warn('请使用list函数，而不是ListDir,我们将在2.0.0弃用它',DeprecationWarning)
 
     def open(
         self, path: Union[str, folder.AListFolder, file.AListFile], password: str = ""
@@ -506,7 +528,7 @@ class AListAdmin(AList):
         super().__init__(endpoint, )
         self.Login(user)
         if self.UserInfo().id != 1:
-            raise error.AuthenticationError("无权限")
+            raise error.AuthenticationError("无管理员权限")
 
     def ListMeta(self, page:int=None, per_page=None):
         '''
