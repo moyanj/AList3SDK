@@ -199,7 +199,7 @@ class AList:
         return True
 
     def Test(self):
-        warnings.warn('请使用test函数，而不是Test,我们将在2.0.0弃用它',DeprecationWarning)
+        raise error.DeprecationError('请使用test函数')
             
     def login(self, user: AListUser, otp_code:str=''):
         """
@@ -240,7 +240,7 @@ class AList:
             (bool): 是否成功
 
         """
-        warnings.warn('请使用login函数，而不是Login,我们将在2.0.0弃用它',DeprecationWarning)
+        raise error.DeprecationError('请使用login函数')
 
     def user_info(self):
         """
@@ -256,9 +256,9 @@ class AList:
         return self._parserJson(r.text).data
 
     def UserInfo(self):
-        warnings.warn('请使用user_info函数，而不是UserInfo,我们将在2.0.0弃用它',DeprecationWarning)
+        raise error.DeprecationError('请使用user_info函数')
 
-    def list(
+    def list_dir(
         self,
         path: Union[str, folder.AListFolder],
         page: int = 1,
@@ -299,8 +299,8 @@ class AList:
             i = {"path": os.path.join(str(path), item["name"]), "is_dir": item["is_dir"]}
             yield utils.ToClass(i)
 
-    def ListDir(self):
-        warnings.warn('请使用list函数，而不是ListDir,我们将在2.0.0弃用它',DeprecationWarning)
+    def ListDir(self, *args, **kwargs):
+        raise error.DeprecationError('请使用list_dir函数')
 
     def open(
         self, path: Union[str, folder.AListFolder, file.AListFile], password: str = ""
@@ -330,7 +330,7 @@ class AList:
         else:
             return file.AListFile(str(path), rjson["data"])
 
-    def Mkdir(self, path: str):
+    def mkdir(self, path: str):
         """
         创建文件夹
 
@@ -349,8 +349,10 @@ class AList:
         self._isBadRequest(r, "创建失败")
 
         return True
-
-    def Upload(self, path: Union[str, file.AListFile], local: str):
+    def Mkdir(self, *args, **kwargs):
+        raise error.DeprecationError('请使用mkdir函数')
+        
+    def upload(self, path: Union[str, file.AListFile], local: str):
         """
         上传文件
 
@@ -377,7 +379,10 @@ class AList:
 
         return True
 
-    def Rename(self, src: Union[str, folder.AListFolder, file.AListFile], dst: str):
+    def Upload(self, *args, **kwargs):
+        raise error.DeprecationError('请使用upload函数')
+
+    def rename(self, src: Union[str, folder.AListFolder, file.AListFile], dst: str):
         """
         重命名
 
@@ -398,7 +403,10 @@ class AList:
         self._isBadRequest(r, "重命名失败")
         return True
 
-    def Remove(self, path: Union[str, file.AListFile]):
+    def Rename(self, *args, **kwargs):
+        raise error.DeprecationError('请使用rename函数')
+
+    def remove(self, path: Union[str, file.AListFile]):
         """
         删除
 
@@ -420,6 +428,9 @@ class AList:
         self._isBadRequest(r, "删除失败")
         return True
 
+    def Remove(self, *args, **kwargs):
+        raise error.DeprecationError('请使用remove函数')
+
     def RemoveFolder(self, path: Union[str, folder.AListFolder]):
         """
         删除文件夹(需为空)
@@ -439,7 +450,10 @@ class AList:
         self._isBadRequest(r, "删除失败")
         return True
 
-    def Copy(
+    def Mkdir(self, *args, **kwargs):
+        raise error.DeprecationError('请使用mkdir函数')
+
+    def copy(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
     ):
         """
@@ -466,7 +480,10 @@ class AList:
         self._isBadRequest(r, "复制失败")
         return True
 
-    def Move(
+    def Copy(self, *args, **kwargs):
+        raise error.DeprecationError('请使用copy函数')
+
+    def move(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
     ):
         """
@@ -494,7 +511,10 @@ class AList:
         self._isBadRequest(r, "移动失败")
         return True
 
-    def SiteConfig(self):
+    def Move(self, *args, **kwargs):
+        raise error.DeprecationError('请使用move函数')
+
+    def site_config(self):
         """
         获取公开站点配置
         
@@ -508,6 +528,9 @@ class AList:
         r = requests.get(url, headers=self.headers)
         self._isBadRequest(r, "AList配置信息获取失败")
         return self._parserJson(r.text).data
+
+    def SiteConfig(self, *args, **kwargs):
+        raise error.DeprecationError('请使用site_config函数')
 
 
 class AListAdmin(AList):
@@ -525,12 +548,12 @@ class AListAdmin(AList):
             endpoint (str) : api端点
             test (bool) : 是否测试服务器
         '''
-        super().__init__(endpoint, )
+        super().__init__(endpoint, test)
         self.Login(user)
         if self.UserInfo().id != 1:
             raise error.AuthenticationError("无管理员权限")
 
-    def ListMeta(self, page:int=None, per_page=None):
+    def list_meta(self, page:int=None, per_page=None):
         '''
         列出元数据
         
@@ -547,8 +570,11 @@ class AListAdmin(AList):
         r = requests.get(url, params=prams, headers=self.headers)
         self._isBadRequest(r, "无法列出元数据")
         return self._parserJson(r.text).data
+
+    def ListMeta(self, *args, **kwargs):
+        raise error.DeprecationError('请使用list_meta函数')
     
-    def GetMeta(self, idx):
+    def get_meta(self, idx):
         '''
         获取元数据
         
@@ -563,4 +589,7 @@ class AListAdmin(AList):
         r = requests.get(url, params={'id':idx},headers=self.headers)
         self._isBadRequest(r, '无法找到该元数据')
         return self._parserJson(r.text).data
+
+    def GetMeta(self, *args, **kwargs):
+        raise error.DeprecationError('请使用get_meta函数')
 
