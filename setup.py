@@ -3,7 +3,7 @@ import time
 
 setup(
     name="alist3",
-    version="1.1.4",
+    version="1.2.0",
     description="AListV3 PythonSDK",
     author="MoYan",
     packages=find_packages(),
@@ -14,10 +14,13 @@ setup(
         "requests",
     ],
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
+        "Topic :: Utilities",
+        "Natural Language :: English",
+        "Natural Language :: Chinese (Simplified)"
     ],
 )

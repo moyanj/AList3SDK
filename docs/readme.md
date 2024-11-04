@@ -1,6 +1,6 @@
 # AList3SDK
 [!WARNING]
-本SDK已发生重大更新，完全不兼容上一个版本(v1.0)
+本SDK已发生重大更新，完全不兼容上一个版本(v1.1.4)
 
 AList3SDK 是用于与 AList 服务集成和交互的 Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
 
@@ -25,7 +25,7 @@ alist = AList("<your-server-url>")
 
 # 登录 AList 服务
 client.login(user)
-response = client.listdir("/")
+response = client.list_dir("/")
 # 处理响应
 print('AList 服务查询结果:', list(response))
 ```
@@ -41,6 +41,7 @@ print('AList 服务查询结果:', list(response))
 ## 常见问题解答
 
 Q: 如果遇到身份验证问题应该怎么办？
+
 A: 请确保您的 AList地址和账号密码正确，并具有足够的权限。
 
 ## 贡献指南
@@ -55,3 +56,4 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 - 1.1.2 (2024-07-04)：适配部分admin操作,添加一多线程下载器
 - 1.1.3 (2024-07-05): 更新文档，增加用户类加载
 - 1.1.4 (2024-08-11): 修复已知问题，优化用户体验
+- 1.2.0 (2024-11-04): 修改大量命名风格
