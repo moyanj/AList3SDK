@@ -7,7 +7,7 @@ name: Upload Python Package gotwo
 on: 
   push:
     branches:
-      "main"
+      - "main"
 
 jobs:
   deploy:
