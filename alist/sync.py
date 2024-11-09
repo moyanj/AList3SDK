@@ -1,6 +1,6 @@
 import asyncio
 from .main import AList, AListAdmin
-
+from .model import AListFile
 
 class AListSync:
     def __init__(self, *args, **kwargs):
@@ -34,3 +34,7 @@ class AListSync:
 class AListAdminSync(AListSync):
     def __init__(self, *args, **kwargs):
         self._async_obj = AListAdmin(*args, **kwargs)
+
+class AListFileSync(AListSync):
+    def __init__(self, *args, **kwargs):
+        self._async_obj = AListFile(*args, **kwargs)
