@@ -38,6 +38,9 @@ class ToClass:
 
     def __str__(self):
         return str(self._conf_Dict)
+    
+    def __repr__(self):
+        return str(self._conf_Dict)
 
 class AListUser:
     '''
