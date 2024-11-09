@@ -1,4 +1,4 @@
-import requests as _req
+import aiohttp
 
 
 class AListFile:
@@ -26,21 +26,22 @@ class AListFile:
     def __exit__(self, exc_type, exc_value, exc_tb):
         pass
 
-    def download(self):
-        r = _req.get(self.url)
-        self.content = r.content
+    async def download(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url) as res:
+                self.content = res.content
 
-    def read(self, n=-1):
+    async def read(self, n=-1):
         if self.content is None:
-            self.download()
-        
+            await self.download()
+
         if n == -1:
-            data = self.content[self.position:]
+            data = self.content[self.position :]
             self.position = self.size  # 移动到文件末尾
             return data
         else:
             end_position = min(self.position + n, self.size)
-            data = self.content[self.position:end_position]
+            data = self.content[self.position : end_position]
             self.position = end_position
             return data
 
@@ -55,12 +56,40 @@ class AListFile:
         # 确保位置不会超出文件大小
         self.position = min(self.position, self.size)
 
-    def save(self, path):
+    async def save(self, path):
         if self.content is None:
-            r = _req.get(self.url)
-            self.content = r.content
+            await self.download()
+
         with open(path, "wb") as f:
             f.write(self.content)
-    
+
     def close(self):
         pass
+
+
+class AListFolder:
+    """
+    AList文件夹
+    """
+
+    def __init__(self, path: str, init: dict):
+        """
+        初始化
+
+        Args:
+            path (str):文件夹路径
+            init (dict):初始化字典
+
+
+        """
+        self.path = path
+        self.provider = init["provider"]
+        self.size = init["size"]
+        self.modified = init["modified"]
+        self.created = init["created"]
+
+    def __str__(self):
+        return self.path
+
+    def __repr__(self):
+        return self.path
