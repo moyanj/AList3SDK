@@ -1,4 +1,10 @@
 # AList3SDK
+![PyPI - Downloads](https://img.shields.io/pypi/dm/alist3)
+![PyPI - Version](https://img.shields.io/pypi/v/alist3)
+![GitHub Repo stars](https://img.shields.io/github/stars/moyanj/AList3SDK)
+![GitHub last commit](https://img.shields.io/github/last-commit/moyanj/AList3SDK)
+![GitHub License](https://img.shields.io/github/license/moyanj/AList3SDK)
+[![Documentation Status](https://readthedocs.org/projects/alist3sdk/badge/?version=latest)](https://alist3sdk.readthedocs.io/zh-cn/latest/?badge=latest)
 
 [!WARNING]
 本SDK已发生重大更新，完全不兼容上一个版本(v1.1.4)
