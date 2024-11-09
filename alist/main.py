@@ -10,7 +10,7 @@ from urllib.parse import quote
 from typing import Union
 from urllib.parse import urljoin
 
-from . import error, file, folder, utils
+from . import error, model, utils
 
 
 class AList:
@@ -139,7 +139,7 @@ class AList:
 
     async def list_dir(
         self,
-        path: Union[str, folder.AListFolder],
+        path: Union[str, model.AListFolder],
         page: int = 1,
         per_page: int = 50,
         refresh: bool = False,
@@ -183,7 +183,7 @@ class AList:
         raise error.DeprecationError("请使用list_dir函数")
 
     async def open(
-        self, path: Union[str, folder.AListFolder, file.AListFile], password: str = ""
+        self, path: Union[str, model.AListFolder, model.AListFile], password: str = ""
     ):
         """
         打开文件/文件夹
@@ -205,9 +205,9 @@ class AList:
         )
 
         if rjson["data"]["is_dir"]:
-            return folder.AListFolder(str(path), rjson["data"])
+            return model.AListFolder(str(path), rjson["data"])
         else:
-            return file.AListFile(str(path), rjson["data"])
+            return model.AListFile(str(path), rjson["data"])
 
     async def mkdir(self, path: str):
         """
@@ -223,7 +223,9 @@ class AList:
         """
         data = json.dumps({"path": path})
 
-        r = await self._request("POST", "/api/fs/mkdir", data=data, headers=self.headers)
+        r = await self._request(
+            "POST", "/api/fs/mkdir", data=data, headers=self.headers
+        )
         self._isBadRequest(r, "创建失败")
 
         return True
@@ -231,7 +233,7 @@ class AList:
     def Mkdir(self, *args, **kwargs):
         raise error.DeprecationError("请使用mkdir函数")
 
-    async def upload(self, path: Union[str, file.AListFile], local: str):
+    async def upload(self, path: Union[str, model.AListFile], local: str):
         """
         上传文件
 
@@ -252,7 +254,7 @@ class AList:
         headers["Content-Length"] = str(len(files))
         del headers["Content-Type"]
 
-        r = await self._request("PUT","/api/fs/put", data=files, headers=headers)
+        r = await self._request("PUT", "/api/fs/put", data=files, headers=headers)
         self._isBadRequest(r, "上传失败")
 
         return True
@@ -260,7 +262,9 @@ class AList:
     def Upload(self, *args, **kwargs):
         raise error.DeprecationError("请使用upload函数")
 
-    async def rename(self, src: Union[str, folder.AListFolder, file.AListFile], dst: str):
+    async def rename(
+        self, src: Union[str, model.AListFolder, model.AListFile], dst: str
+    ):
         """
         重命名
 
@@ -276,14 +280,16 @@ class AList:
 
         data = json.dumps({"path": str(src), "name": dst})
 
-        r = await self._request("POST","/api/fs/rename", headers=self.headers, data=data)
+        r = await self._request(
+            "POST", "/api/fs/rename", headers=self.headers, data=data
+        )
         self._isBadRequest(r, "重命名失败")
         return True
 
     def Rename(self, *args, **kwargs):
         raise error.DeprecationError("请使用rename函数")
 
-    async def remove(self, path: Union[str, file.AListFile]):
+    async def remove(self, path: Union[str, model.AListFile]):
         """
         删除
 
@@ -303,14 +309,16 @@ class AList:
             }
         )
 
-        r = await self._request("POST","/api/fs/remove", data=payload, headers=self.headers)
+        r = await self._request(
+            "POST", "/api/fs/remove", data=payload, headers=self.headers
+        )
         self._isBadRequest(r, "删除失败")
         return True
 
     def Remove(self, *args, **kwargs):
         raise error.DeprecationError("请使用remove函数")
 
-    async def RemoveFolder(self, path: Union[str, folder.AListFolder]):
+    async def RemoveFolder(self, path: Union[str, model.AListFolder]):
         """
         删除文件夹(需为空)
 
@@ -324,7 +332,9 @@ class AList:
         """
 
         data = json.dumps({"src_dir": str(path)})
-        r = await self._request("POST","/api/fs/remove_empty_directory", data=data, headers=self.headers)
+        r = await self._request(
+            "POST", "/api/fs/remove_empty_directory", data=data, headers=self.headers
+        )
         self._isBadRequest(r, "删除失败")
         return True
 
@@ -332,7 +342,7 @@ class AList:
         raise error.DeprecationError("请使用mkdir函数")
 
     async def copy(
-        self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
+        self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
     ):
         """
         复制文件
@@ -353,7 +363,7 @@ class AList:
                 "names": [os.path.basename(str(src))],
             }
         )
-        r = await self._request("POST","/api/fs/copy", data=data, headers=self.headers)
+        r = await self._request("POST", "/api/fs/copy", data=data, headers=self.headers)
         self._isBadRequest(r, "复制失败")
         return True
 
@@ -361,7 +371,7 @@ class AList:
         raise error.DeprecationError("请使用copy函数")
 
     async def move(
-        self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
+        self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
     ):
         """
         移动文件
@@ -383,7 +393,7 @@ class AList:
                 "names": [os.path.basename(str(src))],
             }
         )
-        r = await self._request("POST","/api/fs/move", data=data, headers=self.headers)
+        r = await self._request("POST", "/api/fs/move", data=data, headers=self.headers)
         self._isBadRequest(r, "移动失败")
         return True
 
@@ -442,7 +452,9 @@ class AListAdmin(AList):
         """
 
         prams = {"page": page, "per_page": per_page}
-        r = await self._request("GET","/api/admin/meta/list", params=prams, headers=self.headers)
+        r = await self._request(
+            "GET", "/api/admin/meta/list", params=prams, headers=self.headers
+        )
         self._isBadRequest(r, "无法列出元数据")
         return utils.ToClass(r).data
 

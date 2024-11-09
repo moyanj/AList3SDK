@@ -1,6 +1,7 @@
 import asyncio
 from .main import AList, AListAdmin
 
+
 class AListSync:
     def __init__(self, *args, **kwargs):
         self._async_obj = AList(*args, **kwargs)
@@ -11,6 +12,7 @@ class AListSync:
 
         # 如果该方法是异步的（即协程函数），我们需要创建同步包装
         if asyncio.iscoroutinefunction(func):
+
             def sync_func(*args, **kwargs):
                 # 获取当前事件循环
                 loop = asyncio.get_event_loop()
@@ -22,10 +24,12 @@ class AListSync:
                 else:
                     # 如果没有活动的事件循环，使用 asyncio.run() 来启动新的事件循环
                     return asyncio.run(func(*args, **kwargs))
+
             return sync_func
         else:
             # 如果方法不是异步的，直接返回它
             return func
+
 
 class AListAdminSync(AListSync):
     def __init__(self, *args, **kwargs):
