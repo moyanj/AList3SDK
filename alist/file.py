@@ -1,5 +1,4 @@
-import requests as _req
-
+import aiohttp
 
 class AListFile:
     def __init__(self, path, init):
@@ -26,13 +25,14 @@ class AListFile:
     def __exit__(self, exc_type, exc_value, exc_tb):
         pass
 
-    def download(self):
-        r = _req.get(self.url)
-        self.content = r.content
+    async def download(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url) as res:
+                self.content = res.content
 
-    def read(self, n=-1):
+    async def read(self, n=-1):
         if self.content is None:
-            self.download()
+            await self.download()
         
         if n == -1:
             data = self.content[self.position:]
@@ -55,10 +55,10 @@ class AListFile:
         # 确保位置不会超出文件大小
         self.position = min(self.position, self.size)
 
-    def save(self, path):
+    async def save(self, path):
         if self.content is None:
-            r = _req.get(self.url)
-            self.content = r.content
+            await self.download()
+            
         with open(path, "wb") as f:
             f.write(self.content)
     
