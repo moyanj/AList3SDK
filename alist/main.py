@@ -45,7 +45,7 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.3.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.3.1 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
