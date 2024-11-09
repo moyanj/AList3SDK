@@ -1,4 +1,5 @@
 # AList3SDK
+
 [!WARNING]
 本SDK已发生重大更新，完全不兼容上一个版本(v1.1.4)
 
@@ -21,7 +22,7 @@ from alist import AList, AListUser
 
 # 初始化 AList3SDK 客户端
 user = AListUser("<your-user-name>","<your-password>")
-alist = AList("<your-server-url>")
+client = AList("<your-server-url>")
 
 # 登录 AList 服务
 client.login(user)
@@ -57,3 +58,4 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 - 1.1.3 (2024-07-05): 更新文档，增加用户类加载
 - 1.1.4 (2024-08-11): 修复已知问题，优化用户体验
 - 1.2.0 (2024-11-04): 修改大量命名风格
+- 1.3.0 (2024-11-09): 增加异步支持

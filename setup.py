@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
-import time
 
 setup(
     name="alist3",
-    version="1.2.0",
+    version="1.3.0",
     description="AListV3 PythonSDK",
     author="MoYan",
     packages=find_packages(),
@@ -11,7 +10,7 @@ setup(
     long_description_content_type="text/markdown",  # 描述的内容类型
     install_requires=[
         # 添加你的依赖库
-        "requests",
+        "aiohttp",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -22,5 +21,5 @@ setup(
         "Topic :: Utilities",
         "Natural Language :: English",
         "Natural Language :: Chinese (Simplified)"
-    ],
+    ]
 )
