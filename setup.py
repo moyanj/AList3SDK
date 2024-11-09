@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-import time
 
 setup(
     name="alist3",
@@ -23,4 +22,7 @@ setup(
         "Natural Language :: English",
         "Natural Language :: Chinese (Simplified)"
     ],
+    extras_require={
+        "async":["aiohttp"]
+    }
 )

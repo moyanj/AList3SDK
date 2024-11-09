@@ -1,4 +1,13 @@
 from alist import AList, AListUser
+import asyncio
 
-adm = AListUser("admin", "12r5jhdgchghjkrttjnbg6gxnkuufj[p8tcr8ufyy")
-print(adm.dumps(rawpwd=True))
+
+
+async def run():
+    await alist.login(user)
+    r = alist.list_dir("/")
+    print([item async for item in r])
+    
+
+
+asyncio.run(run())

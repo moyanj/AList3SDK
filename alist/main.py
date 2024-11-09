@@ -1,12 +1,9 @@
 # pylint:disable=W0707
-import requests
-import hashlib
+import aiohttp
 import json
 import os.path
 import sys
-import pickle
-import base64
-import warnings
+import asyncio
 
 from platform import platform
 from urllib.parse import quote
@@ -16,124 +13,15 @@ from urllib.parse import urljoin
 from . import error, file, folder, utils
 
 
-class AListUser:
-    '''
-    AList用户类
-    '''
-   
-    def __init__(self, username: str, rawpwd: str='', pwd=None):
-        """
-        初始化
-        
-        Args:
-            username (str):AList的用户名
-            rawpwd (str):AList的密码(明文)
-            pwd (str):AList的密码(密文)
-
-        """
-        self.un = username
-        
-        if pwd:
-            self.pwd = pwd
-            self.rawpwd = None
-        else:
-            self.rawpwd = rawpwd
-            self.pwd = ''
-            sha = hashlib.sha256()
-            sha.update(self.rawpwd.encode())
-            sha.update(b"-https://github.com/alist-org/alist")
-            self.pwd = sha.hexdigest()
-            
-    def dump(self,fp, rawpwd=False):
-        """
-        保存
-        
-        Args:
-            fp (文件对象):将要保存的文件
-            rawpwd (bool):保存明文密码
-            
-        """
-        
-        data = {
-            'username':base64.b64encode(self.un.encode()),
-            'pwd':base64.b64encode(self.pwd.encode())
-        }
-        if rawpwd and self.rawpwd:
-            warnings.warn('保存明文密码至文件是不安全的',error.SecurityWarning)
-            data['raw'] = base64.b64encode(self.rawpwd.encode())
-        
-        pickle.dump(data,fp)
-    
-    def dumps(self, rawpwd=False):
-        """
-        保存(返回二进制)
-        
-        Args:
-            rawpwd (bool):保存明文密码
-            
-        """
-        
-        data = {
-            'username':base64.b64encode(self.un.encode()),
-            'pwd':base64.b64encode(self.pwd.encode())
-        }
-        if rawpwd and self.rawpwd:
-            warnings.warn('保存明文密码至文件是不安全的',error.SecurityWarning)
-            data['raw'] = base64.b64encode(self.rawpwd.encode())
-        
-        return pickle.dumps(data)
-    
-    @staticmethod
-    def load(fp):
-        """
-        加载
-        
-        Args:
-            fp (文件对象):将要加载的文件
-            
-        """
-        
-        data = pickle.load(fp)
-        un = base64.b64decode(data['username']).decode()
-        pwd = base64.b64decode(data['pwd']).decode()
-        raw = None
-        if 'raw' in data:
-            raw = base64.b64decode(data['raw']).decode()
-        return AListUser(un,pwd,raw)
-        
-        
-    @staticmethod
-    def loads(byte):
-        """
-        加载(从字节)
-        
-        Args:
-            byte (bytes): 将要加载的字节
-            
-        """
-        
-        data = pickle.loads(byte)
-        un = base64.b64decode(data['username']).decode()
-        pwd = base64.b64decode(data['pwd']).decode()
-        raw = None
-        if 'raw' in data:
-            raw = base64.b64decode(data['raw']).decode()
-        return AListUser(un,pwd,raw)
-    
-    def __str__(self):
-        return f'AListUser({self.un})'
-        
-    def __repr__(self):
-        return self.__str__()
-        
 class AList:
-    '''
+    """
     AList的SDK，此为主类。
-    '''
-    def __init__(self, endpoint: str, test:bool=True):
+    """
+
+    def __init__(self, endpoint: str):
         """
         初始化
-        
+
         Args:
             endpoint (str):AList地址
             test (bool):是否测试服务器可用性
@@ -154,54 +42,47 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.2.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.3.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
-        
-        if test:
-            self.Test()
-        
+
     def _isBadRequest(self, r, msg):
         # 是否为不好的请求
-        try:
-            j = json.loads(r.text)
+        if r["code"] != 200:
+            raise error.ServerError(msg + ":" + r["message"])
 
-        except json.JSONDecodeError:
+    async def _request(
+        self, method: str, path: str, *args, **kwargs
+    ):
+        url = urljoin(self.endpoint, path)
+        async with aiohttp.ClientSession() as session:
+            async with session.request(method, url, *args, **kwargs) as response:
+                return await response.json() 
 
-            raise ValueError("服务器返回的数据不是JSON数据")
-
-        if j["code"] != 200:
-            raise error.ServerError(msg + ":" + j["message"])
-
-    def _getURL(self, path):
-        # 获取api端点
-        return urljoin(self.endpoint, path)
-
-    def _parserJson(self, js):
-        return utils.ToClass(json.loads(js))
-    
-    def test(self):
-        '''
+    async def test(self):
+        """
         测试服务器可用性
-        
+
         Returns:
             (bool): 是否可用
-        
-        '''
+
+        """
         try:
-            res = requests.get(self._getURL('/ping'),headers=self.headers)
+            async with aiohttp.ClientSession() as session:
+                async with session.get(urljoin(self.endpoint, "/ping")) as response:
+                    data = await response.text()
         except:
             return False
-            
-        if res.text != 'pong':
+
+        if data != "pong":
             return False
         return True
 
     def Test(self):
-        raise error.DeprecationError('请使用test函数')
-            
-    def login(self, user: AListUser, otp_code:str=''):
+        raise error.DeprecationError("请使用test函数")
+
+    async def login(self, user: utils.AListUser, otp_code: str = ""):
         """
         登录
 
@@ -214,18 +95,19 @@ class AList:
         """
         password = user.pwd
         username = user.un
-        
-        URL = self._getURL("/api/auth/login/hash")
 
         # 构建json数据
         data = {"username": username, "password": password, "otp_code": otp_code}
         data = json.dumps(data)
 
-        r = requests.post(URL, headers=self.headers, data=data)
+        data = await self._request(
+            "POST", "/api/auth/login/hash", headers=self.headers, data=data
+        )
         # 处理返回数据
-        self._isBadRequest(r, "账号或密码错误")
+        self._isBadRequest(data, "Account or password error")
+
         # 保存
-        self.token = json.loads(r.text)["data"]["token"]
+        self.token = data["data"]["token"]
         self.headers["Authorization"] = self.token
         return True
 
@@ -240,9 +122,9 @@ class AList:
             (bool): 是否成功
 
         """
-        raise error.DeprecationError('请使用login函数')
+        raise error.DeprecationError("请使用login函数")
 
-    def user_info(self):
+    async def user_info(self):
         """
         获取当前登录的用户的信息
 
@@ -251,14 +133,13 @@ class AList:
 
         """
 
-        URL = self._getURL("/api/me")
-        r = requests.get(URL, headers=self.headers)
-        return self._parserJson(r.text).data
+        r = await self._request("GET","/api/me", headers=self.headers)
+        return utils.ToClass(r).data
 
     def UserInfo(self):
-        raise error.DeprecationError('请使用user_info函数')
+        raise error.DeprecationError("请使用user_info函数")
 
-    def list_dir(
+    async def list_dir(
         self,
         path: Union[str, folder.AListFolder],
         page: int = 1,
@@ -281,7 +162,6 @@ class AList:
 
         """
 
-        URL = self._getURL("/api/fs/list")
 
         data = json.dumps(
             {
@@ -292,15 +172,18 @@ class AList:
                 "refresh": refresh,
             }
         )
-        r = requests.post(URL, data=data, headers=self.headers)
-        self._isBadRequest(r, "上传失败")
+        r = await self._request("POST","/api/fs/list", data=data, headers=self.headers)
+        self._isBadRequest(r, "获取失败")
 
-        for item in json.loads(r.text)["data"]["content"]:
-            i = {"path": os.path.join(str(path), item["name"]), "is_dir": item["is_dir"]}
+        for item in r["data"]["content"]:
+            i = {
+                "path": os.path.join(str(path), item["name"]),
+                "is_dir": item["is_dir"],
+            }
             yield utils.ToClass(i)
 
     def ListDir(self, *args, **kwargs):
-        raise error.DeprecationError('请使用list_dir函数')
+        raise error.DeprecationError("请使用list_dir函数")
 
     def open(
         self, path: Union[str, folder.AListFolder, file.AListFile], password: str = ""
@@ -349,9 +232,10 @@ class AList:
         self._isBadRequest(r, "创建失败")
 
         return True
+
     def Mkdir(self, *args, **kwargs):
-        raise error.DeprecationError('请使用mkdir函数')
-        
+        raise error.DeprecationError("请使用mkdir函数")
+
     def upload(self, path: Union[str, file.AListFile], local: str):
         """
         上传文件
@@ -380,7 +264,7 @@ class AList:
         return True
 
     def Upload(self, *args, **kwargs):
-        raise error.DeprecationError('请使用upload函数')
+        raise error.DeprecationError("请使用upload函数")
 
     def rename(self, src: Union[str, folder.AListFolder, file.AListFile], dst: str):
         """
@@ -404,7 +288,7 @@ class AList:
         return True
 
     def Rename(self, *args, **kwargs):
-        raise error.DeprecationError('请使用rename函数')
+        raise error.DeprecationError("请使用rename函数")
 
     def remove(self, path: Union[str, file.AListFile]):
         """
@@ -421,7 +305,10 @@ class AList:
 
         URL = self._getURL("/api/fs/remove")
         payload = json.dumps(
-            {"names": [str(os.path.basename(str(path)))], "dir": str(os.path.dirname(str(path)))}
+            {
+                "names": [str(os.path.basename(str(path)))],
+                "dir": str(os.path.dirname(str(path))),
+            }
         )
 
         r = requests.post(URL, data=payload, headers=self.headers)
@@ -429,7 +316,7 @@ class AList:
         return True
 
     def Remove(self, *args, **kwargs):
-        raise error.DeprecationError('请使用remove函数')
+        raise error.DeprecationError("请使用remove函数")
 
     def RemoveFolder(self, path: Union[str, folder.AListFolder]):
         """
@@ -437,7 +324,7 @@ class AList:
 
         Args:
             path (str, AListFolder): 文件夹路径
-            
+
         Returns:
             (bool): 是否成功
 
@@ -451,7 +338,7 @@ class AList:
         return True
 
     def Mkdir(self, *args, **kwargs):
-        raise error.DeprecationError('请使用mkdir函数')
+        raise error.DeprecationError("请使用mkdir函数")
 
     def copy(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
@@ -481,7 +368,7 @@ class AList:
         return True
 
     def Copy(self, *args, **kwargs):
-        raise error.DeprecationError('请使用copy函数')
+        raise error.DeprecationError("请使用copy函数")
 
     def move(
         self, src: Union[str, file.AListFile], dstDir: Union[str, folder.AListFolder]
@@ -512,12 +399,12 @@ class AList:
         return True
 
     def Move(self, *args, **kwargs):
-        raise error.DeprecationError('请使用move函数')
+        raise error.DeprecationError("请使用move函数")
 
     def site_config(self):
         """
         获取公开站点配置
-        
+
         Returns:
             (ToClass): 配置
 
@@ -530,41 +417,42 @@ class AList:
         return self._parserJson(r.text).data
 
     def SiteConfig(self, *args, **kwargs):
-        raise error.DeprecationError('请使用site_config函数')
+        raise error.DeprecationError("请使用site_config函数")
 
 
 class AListAdmin(AList):
-    '''
+    """
     管理员操作
     (继承于AList类)
- 
-    '''
-    def __init__(self, user:AListUser, endpoint:str, test:bool = True):
-        '''
+
+    """
+
+    def __init__(self, user: utils.AListUser, endpoint: str, test: bool = True):
+        """
         初始化
-        
+
         Args:
             user (AListUser) : 用户
             endpoint (str) : api端点
             test (bool) : 是否测试服务器
-        '''
+        """
         super().__init__(endpoint, test)
         self.Login(user)
         if self.UserInfo().id != 1:
             raise error.AuthenticationError("无管理员权限")
 
-    def list_meta(self, page:int=None, per_page=None):
-        '''
+    def list_meta(self, page: int = None, per_page=None):
+        """
         列出元数据
-        
+
         Args:
             page (int) : 页数
             per_page (int) : 每页的数量
-            
+
         Return:
             (ToClass) 数据
-        '''
-        
+        """
+
         url = self._getURL("/api/admin/meta/list")
         prams = {"page": page, "per_page": per_page}
         r = requests.get(url, params=prams, headers=self.headers)
@@ -572,24 +460,23 @@ class AListAdmin(AList):
         return self._parserJson(r.text).data
 
     def ListMeta(self, *args, **kwargs):
-        raise error.DeprecationError('请使用list_meta函数')
-    
+        raise error.DeprecationError("请使用list_meta函数")
+
     def get_meta(self, idx):
-        '''
+        """
         获取元数据
-        
+
         Args:
             idx (int) : 元数据id
-            
+
         Return:
             (ToClass) 数据
-        '''
-        
-        url = self._getURL('/api/admin/meta/get')
-        r = requests.get(url, params={'id':idx},headers=self.headers)
-        self._isBadRequest(r, '无法找到该元数据')
+        """
+
+        url = self._getURL("/api/admin/meta/get")
+        r = requests.get(url, params={"id": idx}, headers=self.headers)
+        self._isBadRequest(r, "无法找到该元数据")
         return self._parserJson(r.text).data
 
     def GetMeta(self, *args, **kwargs):
-        raise error.DeprecationError('请使用get_meta函数')
-
+        raise error.DeprecationError("请使用get_meta函数")
