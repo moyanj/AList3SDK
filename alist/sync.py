@@ -1,5 +1,5 @@
 import asyncio
-from .main import AList
+from .main import AList, AListAdmin
 
 class AListSync:
     def __init__(self, *args, **kwargs):
@@ -27,3 +27,6 @@ class AListSync:
             # 如果方法不是异步的，直接返回它
             return func
 
+class AListAdminSync(AListSync):
+    def __init__(self, *args, **kwargs):
+        self._async_obj = AListAdmin(*args, **kwargs)
