@@ -3,7 +3,6 @@ import aiohttp
 import json
 import os.path
 import sys
-import asyncio
 
 from platform import platform
 from urllib.parse import quote
@@ -16,6 +15,11 @@ from . import error, model, utils
 class AList:
     """
     AList的SDK，此为主类。
+    
+    Attributes:
+        endpoint (str):AList地址
+        headers (dict):全局请求头
+        token (str):JWT Token
     """
 
     def __init__(self, endpoint: str):
@@ -24,7 +28,6 @@ class AList:
 
         Args:
             endpoint (str):AList地址
-            test (bool):是否测试服务器可用性
         """
         if "http" not in endpoint:
             raise ValueError(endpoint + "不是有效的uri")
@@ -110,16 +113,6 @@ class AList:
         return True
 
     def Login(self, *args, **kwargs):
-        """
-        登录
-
-        Args:
-            user (AListUser): AList用户
-
-        Returns:
-            (bool): 是否成功
-
-        """
         raise error.DeprecationError("请使用login函数")
 
     async def user_info(self):
@@ -328,7 +321,6 @@ class AList:
         Returns:
             (bool): 是否成功
 
-
         """
 
         data = json.dumps({"src_dir": str(path)})
@@ -422,8 +414,11 @@ class AList:
 class AListAdmin(AList):
     """
     管理员操作
-    (继承于AList类)
-
+    
+    Attributes:
+        endpoint (str):AList地址
+        headers (dict):全局请求头
+        token (string):JWT Token
     """
 
     def __init__(self, user: utils.AListUser, endpoint: str):

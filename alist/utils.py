@@ -8,10 +8,16 @@ from . import error
 
 
 class ToClass:
+    '''
+    字典转class
+    
+    Attributes:
+        _conf_Dict (dict):原始字典
+    '''
     def __init__(self, conf: dict):
         self._conf_Dict = conf
         self.__name__ = "<Standard Dictionary>"
-        self.update()
+        self._update()
 
     def __getattr__(self, name):
         if name in self._conf_Dict:
@@ -21,7 +27,13 @@ class ToClass:
                 f"'{self.__class__.__name__}' object has no attribute '{name}'"
             )
 
-    def update(self, conf: Union[dict, None] = None):
+    def _update(self, conf: Union[dict, None] = None):
+        '''
+        更新字典内容
+        
+        Args:
+            conf (dict):要更新的字典
+        '''
         if conf:
             self._conf_Dict = conf
         # 更新字典

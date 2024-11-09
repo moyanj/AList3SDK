@@ -11,7 +11,17 @@ plugins:
             - import sys
             - sys.path.insert(0, "..")
 
-            
+nav:
+  - 主页: "index.md"
+  - API参考: 
+    - "apis/main.md"
+    - "apis/model.md"
+    - "apis/sync.md"
+    - "apis/utils.md"
+    - "apis/error.md"
+  - 示例:
+    - "examples/first.md"
+    
 theme:
   name: material
   language: 'zh'  # 配置语言
