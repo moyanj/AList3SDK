@@ -2,12 +2,14 @@
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
 # action的名称
-name: Upload Python Package gotwo
+name: Upload Python Package
 
 on: 
   push:
     branches:
       - "main"
+    paths:
+      - '**.py'
 
 jobs:
   deploy:
@@ -23,7 +25,6 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip twine setuptools wheel
-        python -m pip install -r requirements.txt 
     # 构建和发布
     - name: Build and publish
       env:
