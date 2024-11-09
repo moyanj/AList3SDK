@@ -311,7 +311,7 @@ class AList:
     def Remove(self, *args, **kwargs):
         raise error.DeprecationError("请使用remove函数")
 
-    async def RemoveFolder(self, path: Union[str, model.AListFolder]):
+    async def remove_folder(self, path: Union[str, model.AListFolder]):
         """
         删除文件夹(需为空)
 
@@ -330,8 +330,8 @@ class AList:
         self._isBadRequest(r, "删除失败")
         return True
 
-    def Mkdir(self, *args, **kwargs):
-        raise error.DeprecationError("请使用mkdir函数")
+    def RemoveFolder(self, *args, **kwargs):
+        raise error.DeprecationError("请使用remove_folder函数")
 
     async def copy(
         self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
