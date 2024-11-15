@@ -13,7 +13,9 @@ plugins:
 
 nav:
   - 主页: "index.md"
-  - 开始: "guide.md"
+  - 指引: 
+    - "guide/start.md"
+    - "guide/base.md"
   - API参考: 
     - "apis/main.md"
     - "apis/model.md"

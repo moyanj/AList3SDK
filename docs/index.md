@@ -7,9 +7,9 @@
 [![Documentation Status](https://readthedocs.org/projects/alist3sdk/badge/?version=latest)](https://alist3sdk.readthedocs.io/zh-cn/latest/?badge=latest)
 
 [!WARNING]
-本SDK已发生重大更新，完全不兼容上一个版本(v1.1.4)
+    本SDK默认API已切换为异步API，若需要使用同步API，请使用`AListSync`和`AListAdminSync`，或安装`1.3.2`及以下的版本。
 
-AList3SDK 是用于与 AList 服务集成和交互的 Python SDK。它旨在简化开发人员与 AList 服务进行集成和交互的过程。
+AList3SDK 是一个高性能的 Python SDK，用于与 AList 服务轻松交互 🚀。它支持异步和同步 API ⚡，并提供完善的类型注解 📝，让开发更高效！
 
 ## 安装
 
@@ -21,20 +21,30 @@ pip install alist3
 
 ## 快速开始
 
-使用 AList3SDK，您可以轻松地与 AList 服务进行交互。以下是一个快速示例，演示如何使用 AList3SDK 查询 AList 服务：
+使用 AList3SDK，您可以轻松地与 AList 服务进行交互。以下是一个快速示例：
 
 ```python
+import asyncio
 from alist import AList, AListUser
 
 # 初始化 AList3SDK 客户端
-user = AListUser("<your-user-name>","<your-password>")
-client = AList("<your-server-url>")
+user = AListUser("<your-user-name>", "<your-password>")  # 用户名和密码
+client = AList("<your-server-url>")  # 服务器 URL
 
-# 登录 AList 服务
-client.login(user)
-response = client.list_dir("/")
-# 处理响应
-print('AList 服务查询结果:', list(response))
+async def main():
+    # 登录
+    await client.login(user)
+    
+    # 列出指定目录下的文件
+    res = await client.list_dir("/test")
+    
+    # 打印目录内容
+    async for item in res:
+        print(item)
+
+# 运行异步任务
+asyncio.run(main())
+
 ```
 
 ## 示例代码
@@ -67,3 +77,4 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 - 1.3.0 (2024-11-09): 增加异步支持
 - 1.3.1 (2024-11-09): 修复已知问题，优化用户体验
 - 1.3.2 (2024-11-15): 添加类型注解
+- 1.3.3 (2024-11-15): 切换默认api至异步
