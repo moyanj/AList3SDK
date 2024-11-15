@@ -127,7 +127,7 @@ class AListFile:
             f.write(self.content)
 
     def close(self):
-        pass
+        self.content = b""
 
 
 class AListFolder:
