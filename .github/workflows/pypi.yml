@@ -19,7 +19,7 @@ jobs:
 
     steps:
     # 此步骤使用 GitHub 的 https://github.com/actions/checkout
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     # 安装依赖
     - name: Install dependencies
