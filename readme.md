@@ -1,5 +1,5 @@
 # AList3SDK
-![PyPI - Downloads](https://img.shields.io/pypi/dm/alist3)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/alist3)
 ![PyPI - Version](https://img.shields.io/pypi/v/alist3)
 ![GitHub Repo stars](https://img.shields.io/github/stars/moyanj/AList3SDK)
 ![GitHub last commit](https://img.shields.io/github/last-commit/moyanj/AList3SDK)
