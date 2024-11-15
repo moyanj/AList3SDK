@@ -1,5 +1,5 @@
 # AList3SDK
-![PyPI - Downloads](https://img.shields.io/pypi/dm/alist3)
+![PyPI - Downloads](https://img.shields.io/pypi/dw/alist3)
 ![PyPI - Version](https://img.shields.io/pypi/v/alist3)
 ![GitHub Repo stars](https://img.shields.io/github/stars/moyanj/AList3SDK)
 ![GitHub last commit](https://img.shields.io/github/last-commit/moyanj/AList3SDK)
@@ -66,3 +66,4 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 - 1.2.0 (2024-11-04): 修改大量命名风格
 - 1.3.0 (2024-11-09): 增加异步支持
 - 1.3.1 (2024-11-09): 修复已知问题，优化用户体验
+- 1.3.2 (2024-11-15): 添加类型注解
