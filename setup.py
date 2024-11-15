@@ -29,5 +29,6 @@ setup(
         "Topic :: Utilities",
         "Natural Language :: English",
         "Natural Language :: Chinese (Simplified)"
-    ]
+    ],
+    include_package_data=True
 )
