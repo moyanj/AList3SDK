@@ -6,7 +6,7 @@ import sys
 
 from platform import platform
 from urllib.parse import quote
-from typing import Union
+from typing import Union, Mapping
 from urllib.parse import urljoin
 
 from . import error, model, utils
@@ -32,8 +32,8 @@ class AList:
         if "http" not in endpoint:
             raise ValueError(endpoint + "不是有效的uri")
 
-        self.endpoint = endpoint  # alist地址
-        self.token = ""  # JWT Token
+        self.endpoint:str = endpoint  # alist地址
+        self.token:Union[str,None] = None  # JWT Token
 
         # 构建UA
         ver = [
@@ -44,7 +44,7 @@ class AList:
         ver = ".".join(ver)
         pf = platform().split("-")
 
-        self.headers = {
+        self.headers:Mapping[str,str] = {
             "User-Agent": f"AListSDK/1.3.1 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
@@ -55,13 +55,13 @@ class AList:
         if r["code"] != 200:
             raise error.ServerError(msg + ":" + r["message"])
 
-    async def _request(self, method: str, path: str, *args, **kwargs):
+    async def _request(self, method: str, path: str, *args, **kwargs) -> dict:
         url = urljoin(self.endpoint, path)
         async with aiohttp.ClientSession() as session:
             async with session.request(method, url, *args, **kwargs) as response:
                 return await response.json()
 
-    async def test(self):
+    async def test(self) -> bool:
         """
         测试服务器可用性
 
@@ -83,7 +83,7 @@ class AList:
     def Test(self):
         raise error.DeprecationError("请使用test函数")
 
-    async def login(self, user: utils.AListUser, otp_code: str = ""):
+    async def login(self, user: utils.AListUser, otp_code: str = "") -> bool:
         """
         登录
 
@@ -115,12 +115,12 @@ class AList:
     def Login(self, *args, **kwargs):
         raise error.DeprecationError("请使用login函数")
 
-    async def user_info(self):
+    async def user_info(self) -> utils.ToClass:
         """
         获取当前登录的用户的信息
 
         Returns:
-            (dict):一个字典，包含了当前用户的信息。
+            (ToClass):一个字典，包含了当前用户的信息。
 
         """
 
@@ -177,7 +177,7 @@ class AList:
 
     async def open(
         self, path: Union[str, model.AListFolder, model.AListFile], password: str = ""
-    ):
+    ) -> Union[model.AListFolder, model.AListFile]:
         """
         打开文件/文件夹
 
@@ -202,7 +202,7 @@ class AList:
         else:
             return model.AListFile(str(path), rjson["data"])
 
-    async def mkdir(self, path: str):
+    async def mkdir(self, path: str) -> bool:
         """
         创建文件夹
 
@@ -226,7 +226,7 @@ class AList:
     def Mkdir(self, *args, **kwargs):
         raise error.DeprecationError("请使用mkdir函数")
 
-    async def upload(self, path: Union[str, model.AListFile], local: str):
+    async def upload(self, path: Union[str, model.AListFile], local: str) -> bool:
         """
         上传文件
 
@@ -257,7 +257,7 @@ class AList:
 
     async def rename(
         self, src: Union[str, model.AListFolder, model.AListFile], dst: str
-    ):
+    ) -> bool:
         """
         重命名
 
@@ -282,7 +282,7 @@ class AList:
     def Rename(self, *args, **kwargs):
         raise error.DeprecationError("请使用rename函数")
 
-    async def remove(self, path: Union[str, model.AListFile]):
+    async def remove(self, path: Union[str, model.AListFile]) -> bool:
         """
         删除
 
@@ -311,7 +311,7 @@ class AList:
     def Remove(self, *args, **kwargs):
         raise error.DeprecationError("请使用remove函数")
 
-    async def remove_folder(self, path: Union[str, model.AListFolder]):
+    async def remove_folder(self, path: Union[str, model.AListFolder]) -> bool:
         """
         删除文件夹(需为空)
 
@@ -335,7 +335,7 @@ class AList:
 
     async def copy(
         self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
-    ):
+    ) -> bool:
         """
         复制文件
 
@@ -364,7 +364,7 @@ class AList:
 
     async def move(
         self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
-    ):
+    ) -> bool:
         """
         移动文件
 
@@ -392,14 +392,12 @@ class AList:
     def Move(self, *args, **kwargs):
         raise error.DeprecationError("请使用move函数")
 
-    async def site_config(self):
+    async def site_config(self) -> utils.ToClass:
         """
         获取公开站点配置
 
         Returns:
             (ToClass): 配置
-
-
         """
 
         url = "/api/public/settings"
