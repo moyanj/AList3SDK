@@ -21,6 +21,10 @@ class AList:
         headers (dict):全局请求头
         token (str):JWT Token
     """
+    
+    endpoint:str
+    headers:dict[str,Union[str, None]]
+    token:str
 
     def __init__(self, endpoint: str):
         """
@@ -32,20 +36,20 @@ class AList:
         if "http" not in endpoint:
             raise ValueError(endpoint + "不是有效的uri")
 
-        self.endpoint:str = endpoint  # alist地址
-        self.token:Union[str,None] = None  # JWT Token
+        self.endpoint = endpoint  # alist地址
+        self.token = ""  # JWT Token
 
         # 构建UA
-        ver = [
+        ver_l = [
             str(sys.version_info.major),
             str(sys.version_info.minor),
             str(sys.version_info.micro),
         ]
-        ver = ".".join(ver)
+        ver = ".".join(ver_l)
         pf = platform().split("-")
 
-        self.headers:Mapping[str,str] = {
-            "User-Agent": f"AListSDK/1.3.1 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+        self.headers = {
+            "User-Agent": f"AListSDK/1.3.2 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -99,16 +103,16 @@ class AList:
 
         # 构建json数据
         data = {"username": username, "password": password, "otp_code": otp_code}
-        data = json.dumps(data)
+        payload = json.dumps(data)
 
-        data = await self._request(
-            "POST", "/api/auth/login/hash", headers=self.headers, data=data
+        res = await self._request(
+            "POST", "/api/auth/login/hash", headers=self.headers, data=payload
         )
         # 处理返回数据
-        self._isBadRequest(data, "Account or password error")
+        self._isBadRequest(res, "Account or password error")
 
         # 保存
-        self.token = data["data"]["token"]
+        self.token = res["data"]["token"]
         self.headers["Authorization"] = self.token
         return True
 
@@ -432,7 +436,7 @@ class AListAdmin(AList):
         if self.UserInfo().id != 1:
             raise error.AuthenticationError("无管理员权限")
 
-    async def list_meta(self, page: int = None, per_page=None):
+    async def list_meta(self, page: Union[int, None] = None, per_page=None):
         """
         列出元数据
 

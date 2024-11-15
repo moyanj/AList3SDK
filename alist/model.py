@@ -1,12 +1,13 @@
 import aiohttp
+from typing import Mapping, Union, Any
 
 
 class AListFile:
     """
     AList文件
-    
+
     兼容文件对象
-    
+
     Attributes:
         path (str):文件路径
         name (str):文件名
@@ -20,14 +21,27 @@ class AListFile:
         position (int):文件读取位置
         raw (dict):原始返回信息
     """
-    def __init__(self, path, init):
+
+    path: str
+    name: str
+    provider: int
+    size: int
+    modified: str
+    created: str
+    url: str
+    sign: int
+    content: bytes
+    position: int
+    raw: Mapping[str, Union[str, int]]
+
+    def __init__(self, path: str, init: Mapping[str, Any]):
         """
         初始化
 
         Args:
             path (str):文件路径
             init (dict):初始化字典
-            
+
         """
         self.path = path
         self.name = init["name"]
@@ -37,7 +51,7 @@ class AListFile:
         self.created = init["created"]
         self.url = init["raw_url"]
         self.sign = init["sign"]
-        self.content = None
+        self.content = b""
         self.position = 0  # 文件读取位置
         self.raw = init
 
@@ -61,7 +75,7 @@ class AListFile:
             async with session.get(self.url) as res:
                 self.content = res.content
 
-    async def read(self, n=-1):
+    async def read(self, n: int = -1) -> bytes:
         """
         读文件
 
@@ -81,7 +95,7 @@ class AListFile:
             self.position = end_position
             return data
 
-    def seek(self, offset, whence=0):
+    def seek(self, offset: int, whence: int = 0):
         """
         设置文件指针位置
 
@@ -99,7 +113,7 @@ class AListFile:
         # 确保位置不会超出文件大小
         self.position = min(self.position, self.size)
 
-    async def save(self, path):
+    async def save(self, path: str):
         """
         保存文件至本地
 
@@ -119,7 +133,7 @@ class AListFile:
 class AListFolder:
     """
     AList文件夹
-    
+
     Attributes:
         path (str):文件路径
         size (int):文件大小
@@ -129,7 +143,14 @@ class AListFolder:
         raw (dict):原始返回信息
     """
 
-    def __init__(self, path: str, init: dict):
+    path: str
+    provider: int
+    size: int
+    modified: str
+    created: str
+    raw: Mapping[str, Union[str, int]]
+
+    def __init__(self, path: str, init: Mapping[str, Any]):
         """
         初始化
 

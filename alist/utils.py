@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union,Any
 import pickle
 import base64
 import hashlib
@@ -8,12 +8,13 @@ from . import error
 
 
 class ToClass:
-    '''
+    """
     字典转class
-    
+
     Attributes:
         _conf_Dict (dict):原始字典
-    '''
+    """
+
     def __init__(self, conf: dict):
         self._conf_Dict = conf
         self.__name__ = "<Standard Dictionary>"
@@ -28,12 +29,12 @@ class ToClass:
             )
 
     def _update(self, conf: Union[dict, None] = None):
-        '''
+        """
         更新字典内容
-        
+
         Args:
             conf (dict):要更新的字典
-        '''
+        """
         if conf:
             self._conf_Dict = conf
         # 更新字典
@@ -61,6 +62,10 @@ class AListUser:
     AList用户类
     """
 
+    un: str
+    pwd: str
+    rawpwd: str
+
     def __init__(self, username: str, rawpwd: str = "", pwd=None):
         """
         初始化
@@ -75,7 +80,7 @@ class AListUser:
 
         if pwd:
             self.pwd = pwd
-            self.rawpwd = None
+            self.rawpwd = pwd
         else:
             self.rawpwd = rawpwd
             self.pwd = ""
@@ -84,7 +89,7 @@ class AListUser:
             sha.update(b"-https://github.com/alist-org/alist")
             self.pwd = sha.hexdigest()
 
-    def dump(self, fp, rawpwd=False):
+    def dump(self, fp:Any, rawpwd:bool=False):
         """
         保存
 
@@ -107,7 +112,7 @@ class AListUser:
 
         pickle.dump(data, fp)
 
-    def dumps(self, rawpwd=False):
+    def dumps(self, rawpwd:bool=False) -> bytes:
         """
         保存(返回二进制)
 
@@ -129,8 +134,8 @@ class AListUser:
 
         return pickle.dumps(data)
 
-    @staticmethod
-    def load(fp):
+    @classmethod
+    def load(cls, fp:Any) -> 'AListUser':
         """
         加载
 
@@ -145,10 +150,10 @@ class AListUser:
         raw = None
         if "raw" in data:
             raw = base64.b64decode(data["raw"]).decode()
-        return AListUser(un, pwd, raw)
+        return cls(un, pwd, raw)
 
-    @staticmethod
-    def loads(byte):
+    @classmethod
+    def loads(cls, byte) -> 'AListUser':
         """
         加载(从字节)
 
