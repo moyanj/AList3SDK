@@ -5,9 +5,8 @@ import os.path
 import sys
 
 from platform import platform
-from urllib.parse import quote
-from typing import Union, Mapping
-from urllib.parse import urljoin
+from urllib.parse import quote, urljoin
+from typing import Union
 
 from . import error, model, utils
 
@@ -40,12 +39,12 @@ class AList:
         self.token = ""  # JWT Token
 
         # 构建UA
-        ver_l = [
+        
+        ver = ".".join([
             str(sys.version_info.major),
             str(sys.version_info.minor),
             str(sys.version_info.micro),
-        ]
-        ver = ".".join(ver_l)
+        ])
         pf = platform().split("-")
 
         self.headers = {
@@ -59,10 +58,12 @@ class AList:
         if r["code"] != 200:
             raise error.ServerError(msg + ":" + r["message"])
 
-    async def _request(self, method: str, path: str, *args, **kwargs) -> dict:
+    async def _request(self, method: str, path: str, headers=None, **kwargs) -> dict:
         url = urljoin(self.endpoint, path)
+        if headers is None:
+            headers = self.headers
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, url, *args, **kwargs) as response:
+            async with session.request(method, url, headers=headers, **kwargs) as response: # type: ignore
                 return await response.json()
 
     async def test(self) -> bool:
@@ -106,7 +107,7 @@ class AList:
         payload = json.dumps(data)
 
         res = await self._request(
-            "POST", "/api/auth/login/hash", headers=self.headers, data=payload
+            "POST", "/api/auth/login/hash", data=payload
         )
         # 处理返回数据
         self._isBadRequest(res, "Account or password error")
@@ -128,7 +129,7 @@ class AList:
 
         """
 
-        r = await self._request("GET", "/api/me", headers=self.headers)
+        r = await self._request("GET", "/api/me")
         return utils.ToClass(r).data
 
     def UserInfo(self):
@@ -166,7 +167,7 @@ class AList:
                 "refresh": refresh,
             }
         )
-        r = await self._request("POST", "/api/fs/list", data=data, headers=self.headers)
+        r = await self._request("POST", "/api/fs/list", data=data)
         self._isBadRequest(r, "获取失败")
 
         for item in r["data"]["content"]:
@@ -198,7 +199,7 @@ class AList:
 
         data = json.dumps({"path": str(path), "password": password})
         rjson = await self._request(
-            "POST", "/api/fs/get", headers=self.headers, data=data
+            "POST", "/api/fs/get", data=data
         )
 
         if rjson["data"]["is_dir"]:
@@ -221,7 +222,7 @@ class AList:
         data = json.dumps({"path": path})
 
         r = await self._request(
-            "POST", "/api/fs/mkdir", data=data, headers=self.headers
+            "POST", "/api/fs/mkdir", data=data
         )
         self._isBadRequest(r, "创建失败")
 
@@ -278,7 +279,7 @@ class AList:
         data = json.dumps({"path": str(src), "name": dst})
 
         r = await self._request(
-            "POST", "/api/fs/rename", headers=self.headers, data=data
+            "POST", "/api/fs/rename", data=data
         )
         self._isBadRequest(r, "重命名失败")
         return True
@@ -307,7 +308,7 @@ class AList:
         )
 
         r = await self._request(
-            "POST", "/api/fs/remove", data=payload, headers=self.headers
+            "POST", "/api/fs/remove", data=payload
         )
         self._isBadRequest(r, "删除失败")
         return True
@@ -329,7 +330,7 @@ class AList:
 
         data = json.dumps({"src_dir": str(path)})
         r = await self._request(
-            "POST", "/api/fs/remove_empty_directory", data=data, headers=self.headers
+            "POST", "/api/fs/remove_empty_directory", data=data
         )
         self._isBadRequest(r, "删除失败")
         return True
@@ -359,7 +360,7 @@ class AList:
                 "names": [os.path.basename(str(src))],
             }
         )
-        r = await self._request("POST", "/api/fs/copy", data=data, headers=self.headers)
+        r = await self._request("POST", "/api/fs/copy", data=data)
         self._isBadRequest(r, "复制失败")
         return True
 
@@ -389,7 +390,7 @@ class AList:
                 "names": [os.path.basename(str(src))],
             }
         )
-        r = await self._request("POST", "/api/fs/move", data=data, headers=self.headers)
+        r = await self._request("POST", "/api/fs/move", data=data)
         self._isBadRequest(r, "移动失败")
         return True
 
@@ -405,7 +406,7 @@ class AList:
         """
 
         url = "/api/public/settings"
-        r = await self._request("GET", url, headers=self.headers)
+        r = await self._request("GET", url)
         self._isBadRequest(r, "AList配置信息获取失败")
         return utils.ToClass(r).data
 
@@ -450,7 +451,7 @@ class AListAdmin(AList):
 
         prams = {"page": page, "per_page": per_page}
         r = await self._request(
-            "GET", "/api/admin/meta/list", params=prams, headers=self.headers
+            "GET", "/api/admin/meta/list", params=prams
         )
         self._isBadRequest(r, "无法列出元数据")
         return utils.ToClass(r).data
@@ -470,7 +471,7 @@ class AListAdmin(AList):
         """
 
         url = "/api/admin/meta/get"
-        r = await self._request(url, params={"id": idx}, headers=self.headers)
+        r = await self._request("GET", url, params={"id": idx})
         self._isBadRequest(r, "无法找到该元数据")
         return utils.ToClass(r).data
 

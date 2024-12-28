@@ -73,7 +73,7 @@ class AListFile:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as res:
-                self.content = res.content
+                self.content = await res.read()
 
     async def read(self, n: int = -1) -> bytes:
         """
