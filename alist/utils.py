@@ -1,4 +1,4 @@
-from typing import Union,Any
+from typing import Union, Any
 import pickle
 import base64
 import hashlib
@@ -89,7 +89,7 @@ class AListUser:
             sha.update(b"-https://github.com/alist-org/alist")
             self.pwd = sha.hexdigest()
 
-    def dump(self, fp:Any, rawpwd:bool=False):
+    def dump(self, fp: Any, rawpwd: bool = False):
         """
         保存
 
@@ -112,7 +112,7 @@ class AListUser:
 
         pickle.dump(data, fp)
 
-    def dumps(self, rawpwd:bool=False) -> bytes:
+    def dumps(self, rawpwd: bool = False) -> bytes:
         """
         保存(返回二进制)
 
@@ -135,7 +135,7 @@ class AListUser:
         return pickle.dumps(data)
 
     @classmethod
-    def load(cls, fp:Any) -> 'AListUser':
+    def load(cls, fp: Any) -> "AListUser":
         """
         加载
 
@@ -153,7 +153,7 @@ class AListUser:
         return cls(un, pwd, raw)
 
     @classmethod
-    def loads(cls, byte) -> 'AListUser':
+    def loads(cls, byte) -> "AListUser":
         """
         加载(从字节)
 
@@ -175,3 +175,7 @@ class AListUser:
 
     def __repr__(self):
         return self.__str__()
+
+
+def clear_dict(dic):
+    return {k: v for k, v in dic.items() if v is not None}

@@ -28,7 +28,7 @@ setup(
         "Programming Language :: Python :: 3.13",
         "Topic :: Utilities",
         "Natural Language :: English",
-        "Natural Language :: Chinese (Simplified)"
+        "Natural Language :: Chinese (Simplified)",
     ],
-    include_package_data=True
+    include_package_data=True,
 )

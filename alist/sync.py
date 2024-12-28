@@ -2,10 +2,12 @@ import asyncio
 from .main import AList, AListAdmin
 from .model import AListFile
 
+
 class AListSync:
-    '''
+    """
     AList的同步代理类
-    '''
+    """
+
     def __init__(self, *args, **kwargs):
         self._async_obj = AList(*args, **kwargs)
 
@@ -35,15 +37,18 @@ class AListSync:
 
 
 class AListAdminSync(AListSync):
-    '''
+    """
     AListAdmin的同步代理类
-    '''
+    """
+
     def __init__(self, *args, **kwargs):
         self._async_obj = AListAdmin(*args, **kwargs)
 
+
 class AListFileSync(AListSync):
-    '''
+    """
     AListFile的同步代理类
-    '''
+    """
+
     def __init__(self, *args, **kwargs):
         self._async_obj = AListFile(*args, **kwargs)

@@ -1,7 +1,6 @@
 # pylint:disable=W0707
 import aiohttp
-import json
-import os.path
+import os
 import sys
 
 from platform import platform
@@ -10,20 +9,31 @@ from typing import Union
 
 from . import error, model, utils
 
+try:
+    import ujson as json
+except ImportError:
+    import json
+
+StrNone = Union[str, None]
+File = Union[str, model.AListFile]
+Floder = Union[str, model.AListFolder]
+Paths = Union[File, model.AListFolder]
+ALFS = Union[model.AListFile, model.AListFolder]
+
 
 class AList:
     """
     AList的SDK，此为主类。
-    
+
     Attributes:
         endpoint (str):AList地址
         headers (dict):全局请求头
         token (str):JWT Token
     """
-    
-    endpoint:str
-    headers:dict[str,Union[str, None]]
-    token:str
+
+    endpoint: str
+    headers: dict[str, StrNone]
+    token: str
 
     def __init__(self, endpoint: str):
         """
@@ -39,12 +49,14 @@ class AList:
         self.token = ""  # JWT Token
 
         # 构建UA
-        
-        ver = ".".join([
-            str(sys.version_info.major),
-            str(sys.version_info.minor),
-            str(sys.version_info.micro),
-        ])
+
+        ver = ".".join(
+            [
+                str(sys.version_info.major),
+                str(sys.version_info.minor),
+                str(sys.version_info.micro),
+            ]
+        )
         pf = platform().split("-")
 
         self.headers = {
@@ -63,7 +75,7 @@ class AList:
         if headers is None:
             headers = self.headers
         async with aiohttp.ClientSession() as session:
-            async with session.request(method, url, headers=headers, **kwargs) as response: # type: ignore
+            async with session.request(method, url, headers=headers, **kwargs) as response:  # type: ignore
                 return await response.json()
 
     async def test(self) -> bool:
@@ -106,9 +118,7 @@ class AList:
         data = {"username": username, "password": password, "otp_code": otp_code}
         payload = json.dumps(data)
 
-        res = await self._request(
-            "POST", "/api/auth/login/hash", data=payload
-        )
+        res = await self._request("POST", "/api/auth/login/hash", data=payload)
         # 处理返回数据
         self._isBadRequest(res, "Account or password error")
 
@@ -137,7 +147,7 @@ class AList:
 
     async def list_dir(
         self,
-        path: Union[str, model.AListFolder],
+        path: Floder,
         page: int = 1,
         per_page: int = 50,
         refresh: bool = False,
@@ -180,9 +190,7 @@ class AList:
     def ListDir(self, *args, **kwargs):
         raise error.DeprecationError("请使用list_dir函数")
 
-    async def open(
-        self, path: Union[str, model.AListFolder, model.AListFile], password: str = ""
-    ) -> Union[model.AListFolder, model.AListFile]:
+    async def open(self, path: Paths, password: str = "") -> ALFS:
         """
         打开文件/文件夹
 
@@ -198,16 +206,14 @@ class AList:
         """
 
         data = json.dumps({"path": str(path), "password": password})
-        rjson = await self._request(
-            "POST", "/api/fs/get", data=data
-        )
+        rjson = await self._request("POST", "/api/fs/get", data=data)
 
         if rjson["data"]["is_dir"]:
             return model.AListFolder(str(path), rjson["data"])
         else:
             return model.AListFile(str(path), rjson["data"])
 
-    async def mkdir(self, path: str) -> bool:
+    async def mkdir(self, path: Floder) -> bool:
         """
         创建文件夹
 
@@ -219,11 +225,9 @@ class AList:
 
 
         """
-        data = json.dumps({"path": path})
+        data = json.dumps({"path": str(path)})
 
-        r = await self._request(
-            "POST", "/api/fs/mkdir", data=data
-        )
+        r = await self._request("POST", "/api/fs/mkdir", data=data)
         self._isBadRequest(r, "创建失败")
 
         return True
@@ -231,7 +235,7 @@ class AList:
     def Mkdir(self, *args, **kwargs):
         raise error.DeprecationError("请使用mkdir函数")
 
-    async def upload(self, path: Union[str, model.AListFile], local: str) -> bool:
+    async def upload(self, path: File, local: str) -> bool:
         """
         上传文件
 
@@ -260,9 +264,7 @@ class AList:
     def Upload(self, *args, **kwargs):
         raise error.DeprecationError("请使用upload函数")
 
-    async def rename(
-        self, src: Union[str, model.AListFolder, model.AListFile], dst: str
-    ) -> bool:
+    async def rename(self, src: Paths, dst: str) -> bool:
         """
         重命名
 
@@ -278,16 +280,14 @@ class AList:
 
         data = json.dumps({"path": str(src), "name": dst})
 
-        r = await self._request(
-            "POST", "/api/fs/rename", data=data
-        )
+        r = await self._request("POST", "/api/fs/rename", data=data)
         self._isBadRequest(r, "重命名失败")
         return True
 
     def Rename(self, *args, **kwargs):
         raise error.DeprecationError("请使用rename函数")
 
-    async def remove(self, path: Union[str, model.AListFile]) -> bool:
+    async def remove(self, path: File) -> bool:
         """
         删除
 
@@ -307,16 +307,14 @@ class AList:
             }
         )
 
-        r = await self._request(
-            "POST", "/api/fs/remove", data=payload
-        )
+        r = await self._request("POST", "/api/fs/remove", data=payload)
         self._isBadRequest(r, "删除失败")
         return True
 
     def Remove(self, *args, **kwargs):
         raise error.DeprecationError("请使用remove函数")
 
-    async def remove_folder(self, path: Union[str, model.AListFolder]) -> bool:
+    async def remove_folder(self, path: Floder) -> bool:
         """
         删除文件夹(需为空)
 
@@ -329,18 +327,14 @@ class AList:
         """
 
         data = json.dumps({"src_dir": str(path)})
-        r = await self._request(
-            "POST", "/api/fs/remove_empty_directory", data=data
-        )
+        r = await self._request("POST", "/api/fs/remove_empty_directory", data=data)
         self._isBadRequest(r, "删除失败")
         return True
 
     def RemoveFolder(self, *args, **kwargs):
         raise error.DeprecationError("请使用remove_folder函数")
 
-    async def copy(
-        self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
-    ) -> bool:
+    async def copy(self, src: File, dstDir: Floder) -> bool:
         """
         复制文件
 
@@ -367,9 +361,7 @@ class AList:
     def Copy(self, *args, **kwargs):
         raise error.DeprecationError("请使用copy函数")
 
-    async def move(
-        self, src: Union[str, model.AListFile], dstDir: Union[str, model.AListFolder]
-    ) -> bool:
+    async def move(self, src: File, dstDir: Floder) -> bool:
         """
         移动文件
 
@@ -417,7 +409,7 @@ class AList:
 class AListAdmin(AList):
     """
     管理员操作
-    
+
     Attributes:
         endpoint (str):AList地址
         headers (dict):全局请求头
@@ -449,17 +441,16 @@ class AListAdmin(AList):
             (ToClass) 数据
         """
 
-        prams = {"page": page, "per_page": per_page}
-        r = await self._request(
-            "GET", "/api/admin/meta/list", params=prams
-        )
+        prams = utils.clear_dict({"page": page, "per_page": per_page})
+
+        r = await self._request("GET", "/api/admin/meta/list", params=prams)
         self._isBadRequest(r, "无法列出元数据")
         return utils.ToClass(r).data
 
     def ListMeta(self, *args, **kwargs):
         raise error.DeprecationError("请使用list_meta函数")
 
-    async def get_meta(self, idx):
+    async def get_meta(self, idx: int):
         """
         获取元数据
 
@@ -477,3 +468,115 @@ class AListAdmin(AList):
 
     def GetMeta(self, *args, **kwargs):
         raise error.DeprecationError("请使用get_meta函数")
+
+    async def get_users(self):
+        """
+        获取用户列表
+
+        Returns:
+            (ToClass) 数据
+        """
+        url = "/api/admin/user/list"
+        r = await self._request("GET", url)
+        self._isBadRequest(r, "无法获取用户列表")
+        return utils.ToClass(r).data
+
+    async def get_user(self, idx: int):
+        """
+        获取用户
+
+        Args:
+            idx (int) : 用户id
+
+        Returns:
+            (ToClass) 数据
+        """
+        url = "/api/admin/user/get"
+        r = await self._request("GET", url, params={"id": idx})
+        self._isBadRequest(r, "无法找到该用户")
+        return utils.ToClass(r).data
+
+    async def create_user(
+        self,
+        username: str,
+        password: StrNone = None,
+        base_path: StrNone = None,
+        role: StrNone = None,
+        permission: Union[int, None] = None,
+        disabled: Union[bool, None] = None,
+        sso_id: StrNone = None,
+    ):
+        """
+        创建用户
+        Args:
+            user (AListUser) : 用户
+        Returns:
+            (bool) 是否成功
+        """
+        url = "/api/admin/user/create"
+        data = json.dumps(
+            utils.clear_dict(
+                {
+                    "username": username,
+                    "password": password,
+                    "base_path": base_path,
+                    "role": role,
+                    "permission": permission,
+                    "disabled": disabled,
+                    "sso_id": sso_id,
+                }
+            )
+        )
+        r = await self._request("POST", url, data=data)
+        self._isBadRequest(r, "无法创建用户")
+        return True
+
+    async def update_user(
+        self,
+        idx: int,
+        username: str,
+        password: StrNone = None,
+        base_path: StrNone = None,
+        role: StrNone = None,
+        permission: Union[int, None] = None,
+        disabled: Union[bool, None] = None,
+        sso_id: StrNone = None,
+    ):
+        """
+        更新用户
+        Args:
+            user (AListUser) : 用户
+        Returns:
+            (bool) 是否成功
+        """
+        url = "/api/admin/user/update"
+        data = json.dumps(
+            utils.clear_dict(
+                {
+                    "id": idx,
+                    "username": username,
+                    "password": password,
+                    "base_path": base_path,
+                    "role": role,
+                    "permission": permission,
+                    "disabled": disabled,
+                    "sso_id": sso_id,
+                }
+            )
+        )
+        r = await self._request("POST", url, data=data)
+        self._isBadRequest(r, "无法更新用户")
+        return True
+
+    async def delete_user(self, idx: int):
+        """
+        删除用户
+        Args:
+            idx (int) : 用户id
+        Returns:
+            (bool) 是否成功
+        """
+        url = "/api/admin/user/delete"
+        r = await self._request("POST", url, data=json.dumps({"id": idx}))
+        self._isBadRequest(r, "无法删除用户")
+        return True
