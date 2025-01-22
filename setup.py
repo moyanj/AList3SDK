@@ -13,6 +13,7 @@ setup(
         "aiohttp",
     ],
     python_requires=">=3.9",
+    license_files=["LICENSE"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
