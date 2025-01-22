@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="alist3",
-    version="1.3.4",
-    description="AListV3 PythonSDK",
+    version="1.3.3",
+    description="AList V3 PythonSDK",
     author="MoYan",
     author_email="moyanjdc@qq.com",
     packages=find_packages(),
