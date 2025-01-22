@@ -82,7 +82,7 @@ class AListFile:
         Args:
             n (int):读取的字节大小
         """
-        if self.content is None:
+        if not self.content:
             await self.download()
 
         if n == -1:
@@ -120,7 +120,7 @@ class AListFile:
         Args:
             path (str):路径
         """
-        if self.content is None:
+        if not self.content:
             await self.download()
 
         with open(path, "wb") as f:
