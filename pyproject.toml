@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alist3"
+version = "1.3.5"
+requires-python = ">=3.9"
+description = "AList V3 PythonSDK"
+authors = [
+    { name = "MoYan", email = "moyanjdc@qq.com" }
+]
+license = { file = "LICENSE" }
+readme = "readme.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+    "Natural Language :: English",
+    "Natural Language :: Chinese (Simplified)",
+]
+keywords = ["AList", "PythonSDK", "API"]
+dependencies = ["aiohttp"]
+
+[tool.setuptools]
+packages = { find = { where = ["."] } }
+include-package-data = true
