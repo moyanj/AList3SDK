@@ -97,9 +97,6 @@ class AList:
             return False
         return True
 
-    def Test(self):
-        raise error.DeprecationError("请使用test函数")
-
     async def login(self, user: utils.AListUser, otp_code: str = "") -> bool:
         """
         登录
@@ -127,9 +124,6 @@ class AList:
         self.headers["Authorization"] = self.token
         return True
 
-    def Login(self, *args, **kwargs):
-        raise error.DeprecationError("请使用login函数")
-
     async def user_info(self) -> utils.ToClass:
         """
         获取当前登录的用户的信息
@@ -141,9 +135,6 @@ class AList:
 
         r = await self._request("GET", "/api/me")
         return utils.ToClass(r).data
-
-    def UserInfo(self):
-        raise error.DeprecationError("请使用user_info函数")
 
     async def list_dir(
         self,
@@ -187,9 +178,6 @@ class AList:
             }
             yield utils.ToClass(i)
 
-    def ListDir(self, *args, **kwargs):
-        raise error.DeprecationError("请使用list_dir函数")
-
     async def open(self, path: Paths, password: str = "") -> ALFS:
         """
         打开文件/文件夹
@@ -232,9 +220,6 @@ class AList:
 
         return True
 
-    def Mkdir(self, *args, **kwargs):
-        raise error.DeprecationError("请使用mkdir函数")
-
     async def upload(self, path: File, local: str) -> bool:
         """
         上传文件
@@ -261,9 +246,6 @@ class AList:
 
         return True
 
-    def Upload(self, *args, **kwargs):
-        raise error.DeprecationError("请使用upload函数")
-
     async def rename(self, src: Paths, dst: str) -> bool:
         """
         重命名
@@ -283,9 +265,6 @@ class AList:
         r = await self._request("POST", "/api/fs/rename", data=data)
         self._isBadRequest(r, "重命名失败")
         return True
-
-    def Rename(self, *args, **kwargs):
-        raise error.DeprecationError("请使用rename函数")
 
     async def remove(self, path: File) -> bool:
         """
@@ -311,9 +290,6 @@ class AList:
         self._isBadRequest(r, "删除失败")
         return True
 
-    def Remove(self, *args, **kwargs):
-        raise error.DeprecationError("请使用remove函数")
-
     async def remove_folder(self, path: Floder) -> bool:
         """
         删除文件夹(需为空)
@@ -330,9 +306,6 @@ class AList:
         r = await self._request("POST", "/api/fs/remove_empty_directory", data=data)
         self._isBadRequest(r, "删除失败")
         return True
-
-    def RemoveFolder(self, *args, **kwargs):
-        raise error.DeprecationError("请使用remove_folder函数")
 
     async def copy(self, src: File, dstDir: Floder) -> bool:
         """
@@ -357,9 +330,6 @@ class AList:
         r = await self._request("POST", "/api/fs/copy", data=data)
         self._isBadRequest(r, "复制失败")
         return True
-
-    def Copy(self, *args, **kwargs):
-        raise error.DeprecationError("请使用copy函数")
 
     async def move(self, src: File, dstDir: Floder) -> bool:
         """
@@ -386,9 +356,6 @@ class AList:
         self._isBadRequest(r, "移动失败")
         return True
 
-    def Move(self, *args, **kwargs):
-        raise error.DeprecationError("请使用move函数")
-
     async def site_config(self) -> utils.ToClass:
         """
         获取公开站点配置
@@ -401,33 +368,6 @@ class AList:
         r = await self._request("GET", url)
         self._isBadRequest(r, "AList配置信息获取失败")
         return utils.ToClass(r).data
-
-    def SiteConfig(self, *args, **kwargs):
-        raise error.DeprecationError("请使用site_config函数")
-
-
-class AListAdmin(AList):
-    """
-    管理员操作
-
-    Attributes:
-        endpoint (str):AList地址
-        headers (dict):全局请求头
-        token (string):JWT Token
-    """
-
-    def __init__(self, user: utils.AListUser, endpoint: str):
-        """
-        初始化
-
-        Args:
-            user (AListUser) : 用户
-            endpoint (str) : api端点
-        """
-        super().__init__(endpoint)
-        self.Login(user)
-        if self.UserInfo().id != 1:
-            raise error.AuthenticationError("无管理员权限")
 
     async def list_meta(self, page: Union[int, None] = None, per_page=None):
         """
@@ -447,9 +387,6 @@ class AListAdmin(AList):
         self._isBadRequest(r, "无法列出元数据")
         return utils.ToClass(r).data
 
-    def ListMeta(self, *args, **kwargs):
-        raise error.DeprecationError("请使用list_meta函数")
-
     async def get_meta(self, idx: int):
         """
         获取元数据
@@ -465,9 +402,6 @@ class AListAdmin(AList):
         r = await self._request("GET", url, params={"id": idx})
         self._isBadRequest(r, "无法找到该元数据")
         return utils.ToClass(r).data
-
-    def GetMeta(self, *args, **kwargs):
-        raise error.DeprecationError("请使用get_meta函数")
 
     async def get_users(self):
         """

@@ -1,5 +1,5 @@
 import asyncio
-from .main import AList, AListAdmin
+from .main import AList
 from .model import AListFile
 
 
@@ -34,15 +34,6 @@ class AListSync:
         else:
             # 如果方法不是异步的，直接返回它
             return func
-
-
-class AListAdminSync(AListSync):
-    """
-    AListAdmin的同步代理类
-    """
-
-    def __init__(self, *args, **kwargs):
-        self._async_obj = AListAdmin(*args, **kwargs)
 
 
 class AListFileSync(AListSync):

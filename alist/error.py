@@ -24,7 +24,3 @@ class ServerError(AListError):
 
 class SecurityWarning(Warning):
     pass
-
-
-class DeprecationError(Exception):
-    pass
