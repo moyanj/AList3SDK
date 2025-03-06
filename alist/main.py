@@ -3,9 +3,10 @@ import aiohttp
 import os
 import sys
 
+
 from platform import platform
 from urllib.parse import quote, urljoin
-from typing import Union
+from typing import Union, BinaryIO
 
 from . import error, model, utils
 
@@ -220,20 +221,27 @@ class AList:
 
         return True
 
-    async def upload(self, path: File, local: str) -> bool:
+    async def upload(self, path: Union[str, model.AListFile], local: Union[str, bytes, BinaryIO]) -> bool:
         """
         上传文件
 
         Args:
             path (str, AListFile): 上传的路径
-            local (str): 本地路径
+            local (str, bytes, BinaryIO): 本地路径或字节数据或文件指针
 
         Returns:
             (bool): 是否成功
 
         """
 
-        files = open(local, "rb").read()
+        if isinstance(local, bytes):
+            files = local
+        elif isinstance(local, BinaryIO):
+            files = local.read()
+        else:
+            with open(local, "rb") as f:
+                files = f.read()
+
         FilePath = quote(str(path))
 
         headers = self.headers.copy()
