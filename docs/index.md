@@ -7,7 +7,7 @@
 [![Documentation Status](https://readthedocs.org/projects/alist3sdk/badge/?version=latest)](https://alist3sdk.readthedocs.io/zh-cn/latest/?badge=latest)
 
 [!WARNING]
-    本SDK默认API已切换为异步API，若需要使用同步API，请使用`AListSync`和`AListAdminSync`，或安装`1.3.2`及以下的版本。
+本SDK默认API已切换为异步API,若需要使用同步API,请使用`AListSync`和`AListAdminSync`，或安装`1.3.2`及以下的版本
 
 AList3SDK 是一个高性能的 Python SDK，用于与 AList 服务轻松交互 🚀。它支持异步和同步 API ⚡，并提供完善的类型注解 📝，让开发更高效！
 
@@ -79,3 +79,5 @@ A: 请确保您的 AList地址和账号密码正确，并具有足够的权限�
 - 1.3.2 (2024-11-15): 添加类型注解
 - 1.3.3 (2024-11-15): 切换默认api至异步
 - 1.3.4 (2024-12-29): 修复已知问题，支持用户管理
+- 1.3.5 (2025-01-22): 修复AListFile自动下载问题
+- 1.3.6 (2025-03-07): 增加对上传字节数据和文件指针的支持
