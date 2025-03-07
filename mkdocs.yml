@@ -7,9 +7,7 @@ plugins:
         python:
           options:
             show_source: false
-          setup_commands:
-            - import sys
-            - sys.path.insert(0, "..")
+            paths: ["."]
 
 nav:
   - 主页: "index.md"
