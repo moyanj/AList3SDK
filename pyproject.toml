@@ -32,3 +32,4 @@ dependencies = ["aiohttp"]
 [tool.setuptools]
 packages = { find = { where = ["."] } }
 include-package-data = true
+license-files = []
