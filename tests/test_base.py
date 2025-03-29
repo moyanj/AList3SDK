@@ -3,14 +3,6 @@ import alist
 from aioresponses import aioresponses
 
 
-def test_AListUser():
-    user = alist.AListUser("admin", "123456")
-    assert (
-        user.pwd == "e166b45e39301021e897e3a6713e11171893217ad2901cf28c2c09c8d54e55d9"
-    )
-    assert user.rawpwd == "123456"
-
-
 def test_error_endpoint():
     with pytest.raises(ValueError):
         alist.AList("111")
@@ -56,34 +48,59 @@ async def test_login():
 
 
 @pytest.mark.asyncio
-async def test_user_info():
+async def test_list_dir():
     with aioresponses() as m:
-        m.get(
-            "http://test/api/me",
+        m.post(
+            "http://test/api/fs/list",
             payload={
                 "code": 200,
                 "message": "success",
                 "data": {
-                    "id": 1,
-                    "username": "admin",
-                    "password": "",
-                    "base_path": "/",
-                    "role": 2,
-                    "disabled": False,
-                    "permission": 0,
-                    "sso_id": "",
-                    "otp": True,
+                    "content": [
+                        {
+                            "name": "Alist V3.md",
+                            "is_dir": False,
+                        }
+                    ]
                 },
             },
         )
         alis = alist.AList("http://test")
-        resp = await alis.user_info()
-        assert resp.id == 1
-        assert resp.username == "admin"
-        assert resp.password == ""
-        assert resp.base_path == "/"
-        assert resp.role == 2
-        assert resp.disabled == False
-        assert resp.permission == 0
-        assert resp.sso_id == ""
-        assert resp.otp == True
+        async for i in alis.list_dir("/"):
+            assert i.path == "/Alist V3.md"
+            assert i.is_dir is False
+
+
+@pytest.mark.asyncio
+async def test_list_dir_folder():
+    with aioresponses() as m:
+        m.post(
+            "http://test/api/fs/list",
+            payload={
+                "code": 200,
+                "message": "success",
+                "data": {
+                    "content": [
+                        {
+                            "name": "Alist V3.md",
+                            "is_dir": False,
+                        }
+                    ]
+                },
+            },
+        )
+        alis = alist.AList("http://test")
+        async for i in alis.list_dir(
+            alist.AListFolder(
+                "/",
+                {
+                    "name": "Alist V3.md",
+                    "size": 2618,
+                    "modified": "2024-05-17T16:05:36.4651534+08:00",
+                    "created": "2024-05-17T16:05:29.2001008+08:00",
+                    "provider": "Local",
+                },
+            )
+        ):
+            assert i.path == "/Alist V3.md"
+            assert i.is_dir is False
