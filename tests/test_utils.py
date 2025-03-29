@@ -64,9 +64,9 @@ async def test_AListFile_download():
             "http://1/",
             body=b"Hello World",
         )
-        f = alist.AListFile("/", alist_file_init)
-        await f.download()
-        assert f.content == b"Hello World"
+        async with alist.AListFile("/", alist_file_init) as f:
+            await f.download()
+            assert await f.read() == b"Hello World"
 
 
 async def test_AListFile_read():
@@ -75,31 +75,26 @@ async def test_AListFile_read():
             "http://1/",
             body=b"Hello World",
         )
-        f = alist.AListFile("/", alist_file_init)
+        async with alist.AListFile("/", alist_file_init) as f:
 
-        # 读取一个字节
-        d = await f.read(1)
-        assert d == b"H"
-        assert f.position == 1
+            # 读取一个字节
+            d = await f.read(1)
+            assert d == b"H"
 
-        # 再次读取两个字节
-        d = await f.read(2)
-        assert d == b"el"
-        assert f.position == 3
+            # 再次读取两个字节
+            d = await f.read(2)
+            assert d == b"el"
 
-        # 读取剩下的
-        d = await f.read()
-        assert d == b"lo World"
-        assert f.position == 11
+            # 读取剩下的
+            d = await f.read()
+            assert d == b"lo World"
 
-        # 读取全部
-        f.seek(0)
-        assert await f.read() == b"Hello World"
-        assert f.position == 11
+            # 读取全部
+            await f.seek(0)
+            assert await f.read() == b"Hello World"
 
 
 def test_AListFile_magic():
     f = alist.AListFile("/", alist_file_init)
     assert len(f) == 11
     assert str(f) == "/"
-    assert f.__enter__() is f

@@ -1,8 +1,7 @@
 import aiohttp
-from typing import Mapping, Union, Any
+from typing import Mapping, Union, Any, Optional, AsyncGenerator
 import aiofiles
 from aiofiles import tempfile
-from aiofiles.threadpool import AsyncBufferedIOBase
 
 
 class AListFile:
@@ -34,12 +33,18 @@ class AListFile:
         self.raw = init
 
         # 文件操作相关
-        self._file: Optional[AsyncBufferedIOBase] = None
+        self._file = None
         self._closed = False
 
-    # --------------------------
-    # 核心文件操作API
-    # --------------------------
+    def __len__(self) -> int:
+        return self._size
+
+    def __repr__(self) -> str:
+        return f"<AListFile {self.path}>"
+
+    def __str__(self) -> str:
+        return self.path
+
     async def __aenter__(self):
         if self._closed:
             raise ValueError("Cannot reopen closed file")
@@ -54,7 +59,7 @@ class AListFile:
     async def close(self) -> None:
         """关闭文件并释放资源"""
         if self._file and not self._closed:
-            await self._file.__aexit__(None, None, None)
+            await self._file.close()
             self._closed = True
 
     @property
@@ -83,6 +88,10 @@ class AListFile:
 
     async def read(self, n: int = -1) -> bytes:
         """读取指定字节数"""
+
+        if await self._get_actual_size() == 0:
+            await self.download()
+
         self._check_open()
         return await self._file.read(n)  # type: ignore
 
@@ -95,21 +104,6 @@ class AListFile:
         """读取所有行"""
         self._check_open()
         return await self._file.readlines()  # type: ignore
-
-    async def write(self, data: bytes) -> int:
-        """写入数据（注意：会改变文件大小）"""
-        self._check_open()
-        written = await self._file.write(data)  # type: ignore
-        current_pos = await self.tell()
-        self._size = max(self._size, current_pos)  # 更新跟踪大小
-        return written
-
-    async def truncate(self, size: Optional[int] = None) -> int:
-        """截断/扩展文件到指定大小"""
-        self._check_open()
-        new_size = await self._file.truncate(size)  # type: ignore
-        self._size = new_size
-        return new_size
 
     async def flush(self) -> None:
         """强制刷写缓冲区到磁盘"""
@@ -141,11 +135,11 @@ class AListFile:
 
                 # 清空已有内容
                 await self.seek(0)
-                await self.truncate(0)
+                await self._file.truncate(0)  # type: ignore
 
                 # 流式写入
                 async for chunk in response.content.iter_chunked(chunk_size):
-                    await self.write(chunk)
+                    await self._file.write(chunk)  # type: ignore
 
                 # 重置指针
                 await self.seek(0)
