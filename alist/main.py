@@ -119,7 +119,7 @@ class AList:
 
         # 保存
         self.token = res["data"]["token"]
-        self.headers["Authorization"] = f"Bearer {self.token}"
+        self.headers["Authorization"] = f"{self.token}"
         return True
 
     async def user_info(self) -> utils.ToClass:
