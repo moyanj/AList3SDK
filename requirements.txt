@@ -7,3 +7,4 @@ mypy
 pytest
 pytest-asyncio
 aioresponses
+aiofiles
