@@ -91,9 +91,9 @@ class AList:
             print(f"Error: {e}")
             return False
 
-        if data != "pong":
-            return False
-        return True
+        if data == "pong":
+            return True
+        return False
 
     async def login(self, user: utils.AListUser, otp_code: str = "") -> bool:
         """

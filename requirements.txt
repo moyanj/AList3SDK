@@ -4,3 +4,6 @@ mkdocs-material
 mkdocstrings
 mkdocstrings[python]
 mypy
+pytest
+pytest-asyncio
+aioresponses

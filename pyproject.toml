@@ -33,3 +33,13 @@ dependencies = ["aiohttp"]
 packages = { find = { where = ["."] } }
 include-package-data = true
 license-files = []
+
+[tool.pytest.ini_options]
+# 其他配置（匹配测试文件、类、函数名）
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+# 默认命令行参数（可选）
+addopts = ["-v", "--color=yes"]
