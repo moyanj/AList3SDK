@@ -188,6 +188,12 @@ class AListFile:
         await self.seek(current_pos)  # 恢复原位置
         return size
 
+    def to_sync(self):
+        """转换为同步文件对象"""
+        from alist.sync import AListFileSync
+
+        return AListFileSync(async_obj=self)
+
 
 class AListFolder:
     """

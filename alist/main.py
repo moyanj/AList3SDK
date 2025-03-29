@@ -515,3 +515,11 @@ class AList:
         r = await self._request("POST", url, data=json.dumps({"id": idx}))
         self._isBadRequest(r, "无法删除用户")
         return True
+
+    def to_sync(self):
+        """
+        转换为同步对象"
+        """
+        from . import sync
+
+        return sync.AListSync(async_obj=self)
