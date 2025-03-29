@@ -51,6 +51,7 @@ class AListFile:
         self._file = await tempfile.SpooledTemporaryFile(
             max_size=10 * 1024 * 1024
         ).__aenter__()
+        await self.download()
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -88,10 +89,6 @@ class AListFile:
 
     async def read(self, n: int = -1) -> bytes:
         """读取指定字节数"""
-
-        if await self._get_actual_size() == 0:
-            await self.download()
-
         self._check_open()
         return await self._file.read(n)  # type: ignore
 
@@ -104,6 +101,13 @@ class AListFile:
         """读取所有行"""
         self._check_open()
         return await self._file.readlines()  # type: ignore
+
+    async def truncate(self, size: Optional[int] = None) -> int:
+        """截断/扩展文件到指定大小"""
+        self._check_open()
+        new_size = await self._file.truncate(size)  # type: ignore
+        self._size = new_size
+        return new_size
 
     async def flush(self) -> None:
         """强制刷写缓冲区到磁盘"""
@@ -135,7 +139,7 @@ class AListFile:
 
                 # 清空已有内容
                 await self.seek(0)
-                await self._file.truncate(0)  # type: ignore
+                await self.truncate(0)  # type: ignore
 
                 # 流式写入
                 async for chunk in response.content.iter_chunked(chunk_size):

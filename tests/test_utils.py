@@ -65,7 +65,6 @@ async def test_AListFile_download():
             body=b"Hello World",
         )
         async with alist.AListFile("/", alist_file_init) as f:
-            await f.download()
             assert await f.read() == b"Hello World"
 
 
@@ -88,13 +87,64 @@ async def test_AListFile_read():
             # 读取剩下的
             d = await f.read()
             assert d == b"lo World"
-
             # 读取全部
             await f.seek(0)
             assert await f.read() == b"Hello World"
 
 
+async def test_AListFile_readline():
+    with aioresponses() as m:
+        m.get(
+            "http://1/",
+            body=b"Hello World\nHello World",
+        )
+        async with alist.AListFile("/", alist_file_init) as f:
+            d = await f.readline()
+            assert d == b"Hello World\n"
+
+
+async def test_AListFile_readlines():
+    with aioresponses() as m:
+        m.get(
+            "http://1/",
+            body=b"Hello World\nHello World",
+        )
+
+
+async def test_AListFile_seek():
+    with aioresponses() as m:
+        m.get(
+            "http://1/",
+            body=b"Hello World",
+        )
+        async with alist.AListFile("/", alist_file_init) as f:
+            # await f.download()
+            # 从第五个字符开始读取
+            await f.seek(5)
+            assert await f.read() == b" World"
+            # 剩下的
+            assert await f.read() == b""
+            assert await f.read(1) == b""
+            assert await f.readline() == b""
+            assert await f.readlines() == []
+            assert await f.tell() == 11
+            assert await f.seek(0) == 0
+            assert await f.tell() == 0
+            assert await f.read() == b"Hello World"
+            assert await f.read() == b""
+            assert await f.readline() == b""
+            assert await f.readlines() == []
+            assert await f.tell() == 11
+            assert await f.seek(0) == 0
+            assert await f.tell() == 0
+
+
 def test_AListFile_magic():
-    f = alist.AListFile("/", alist_file_init)
-    assert len(f) == 11
-    assert str(f) == "/"
+    with aioresponses() as m:
+        m.get(
+            "http://1/",
+            body=b"Hello World",
+        )
+        f = alist.AListFile("/", alist_file_init)
+        assert len(f) == 11
+        assert str(f) == "/"
