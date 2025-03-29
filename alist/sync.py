@@ -1,15 +1,8 @@
 import asyncio
-from typing import (
-    Any,
-    Optional,
-    TypeVar,
-    Generic,
-    Type,
-    get_type_hints,
-)
+from typing import Any, Optional, TypeVar, Generic, Type, get_type_hints, Union
 from concurrent.futures import ThreadPoolExecutor
 from .main import AList
-from .model import AListFile
+from .model import AListFile, AListFolder
 
 T = TypeVar("T")  # 异步类泛型
 
@@ -91,7 +84,17 @@ class Sync(Generic[T]):
 class AListSync(Sync[AList]):
     """AList 的同步代理类"""
 
-    ASYNC_CLASS = AList  # 绑定异步类
+    ASYNC_CLASS = AList
+
+    def open(
+        self, path: str, password: str = ""
+    ) -> Union["AListFileSync", AListFolder]:
+        """打开文件或文件夹"""
+        obj = self.__getattr__("open")(path, password)
+        if isinstance(obj, AListFile):
+            return AListFileSync(async_obj=obj)
+        else:
+            return obj
 
 
 class AListFileSync(Sync[AListFile]):
