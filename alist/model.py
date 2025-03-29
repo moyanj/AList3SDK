@@ -1,133 +1,194 @@
 import aiohttp
 from typing import Mapping, Union, Any
+import aiofiles
+from aiofiles import tempfile
+from aiofiles.threadpool import AsyncBufferedIOBase
 
 
 class AListFile:
     """
-    AList文件
-
-    兼容文件对象
+    AList文件（兼容异步文件对象）
 
     Attributes:
-        path (str):文件路径
-        name (str):文件名
-        size (int):文件大小
-        provider (int):存储类型
-        modified (str):修改时间
-        created (str):创建时间
-        url (str):文件下载URL
-        sign (str):签名
-        content (bytes):文件内容
-        position (int):文件读取位置
-        raw (dict):原始返回信息
+        path (str): 文件路径
+        name (str): 文件名
+        size (int): 文件大小
+        provider (int): 存储类型
+        modified (str): 修改时间
+        created (str): 创建时间
+        url (str): 文件下载URL
+        sign (str): 签名
+        raw (dict): 原始返回信息
     """
 
-    path: str
-    name: str
-    provider: int
-    size: int
-    modified: str
-    created: str
-    url: str
-    sign: int
-    content: bytes
-    position: int
-    raw: Mapping[str, Union[str, int]]
-
     def __init__(self, path: str, init: Mapping[str, Any]):
-        """
-        初始化
-
-        Args:
-            path (str):文件路径
-            init (dict):初始化字典
-
-        """
+        # 初始化元数据
         self.path = path
-        self.name = init["name"]
-        self.provider = init["provider"]
-        self.size = init["size"]
-        self.modified = init["modified"]
-        self.created = init["created"]
-        self.url = init["raw_url"]
-        self.sign = init["sign"]
-        self.content = b""
-        self.position = 0  # 文件读取位置
+        self.name = init.get("name", "")
+        self.provider = init.get("provider", 0)
+        self._size = init.get("size", 0)  # 私有变量用于跟踪实际大小
+        self.modified = init.get("modified", "")
+        self.created = init.get("created", "")
+        self.url = init.get("raw_url", "")
+        self.sign = str(init.get("sign", ""))
         self.raw = init
 
-    def __len__(self):
-        return self.size
+        # 文件操作相关
+        self._file: Optional[AsyncBufferedIOBase] = None
+        self._closed = False
 
-    def __str__(self):
-        return self.path
-
-    def __enter__(self):
+    # --------------------------
+    # 核心文件操作API
+    # --------------------------
+    async def __aenter__(self):
+        if self._closed:
+            raise ValueError("Cannot reopen closed file")
+        self._file = await tempfile.SpooledTemporaryFile(
+            max_size=10 * 1024 * 1024
+        ).__aenter__()
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_tb):
-        pass
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.close()
 
-    async def download(self):
+    async def close(self) -> None:
+        """关闭文件并释放资源"""
+        if self._file and not self._closed:
+            await self._file.__aexit__(None, None, None)
+            self._closed = True
+
+    @property
+    def closed(self) -> bool:
+        """检查文件是否已关闭"""
+        return self._closed
+
+    async def tell(self) -> int:
+        """获取当前文件指针位置"""
+        self._check_open()
+        return await self._file.tell()  # type: ignore
+
+    async def seek(self, offset: int, whence: int = 0) -> int:
         """
-        下载文件至内存
+        移动文件指针
+        :param offset: 偏移量
+        :param whence: 0=文件头, 1=当前位置, 2=文件尾
+        :return: 新的绝对位置
         """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.url) as res:
-                self.content = await res.read()
+        self._check_open()
+        new_pos = await self._file.seek(offset, whence)  # type: ignore
+        # 更新内部_size跟踪（如果通过truncate改变大小）
+        if whence == 2:
+            self._size = max(0, self._size + offset)
+        return new_pos
 
     async def read(self, n: int = -1) -> bytes:
-        """
-        读文件
+        """读取指定字节数"""
+        self._check_open()
+        return await self._file.read(n)  # type: ignore
 
-        Args:
-            n (int):读取的字节大小
-        """
-        if not self.content:
-            await self.download()
+    async def readline(self) -> bytes:
+        """读取单行（直到换行符）"""
+        self._check_open()
+        return await self._file.readline()  # type: ignore
 
-        if n == -1:
-            data = self.content[self.position :]
-            self.position = self.size  # 移动到文件末尾
-            return data
-        else:
-            end_position = min(self.position + n, self.size)
-            data = self.content[self.position : end_position]
-            self.position = end_position
-            return data
+    async def readlines(self) -> list[bytes]:
+        """读取所有行"""
+        self._check_open()
+        return await self._file.readlines()  # type: ignore
 
-    def seek(self, offset: int, whence: int = 0):
-        """
-        设置文件指针位置
+    async def write(self, data: bytes) -> int:
+        """写入数据（注意：会改变文件大小）"""
+        self._check_open()
+        written = await self._file.write(data)  # type: ignore
+        current_pos = await self.tell()
+        self._size = max(self._size, current_pos)  # 更新跟踪大小
+        return written
 
-        Args:
-            offset (int):偏移量
-            whence (int):基准
-        """
-        if whence == 0:
-            self.position = offset
-        elif whence == 1:
-            self.position += offset
-        elif whence == 2:
-            self.position = max(0, self.size + offset)  # 防止移动到文件末尾之后
+    async def truncate(self, size: Optional[int] = None) -> int:
+        """截断/扩展文件到指定大小"""
+        self._check_open()
+        new_size = await self._file.truncate(size)  # type: ignore
+        self._size = new_size
+        return new_size
 
-        # 确保位置不会超出文件大小
-        self.position = min(self.position, self.size)
+    async def flush(self) -> None:
+        """强制刷写缓冲区到磁盘"""
+        self._check_open()
+        await self._file.flush()  # type: ignore
 
-    async def save(self, path: str):
-        """
-        保存文件至本地
+    def fileno(self) -> int:
+        """获取文件描述符（同步方法）"""
+        self._check_open()
+        return self._file.fileno()  # type: ignore
 
-        Args:
-            path (str):路径
-        """
-        if not self.content:
-            await self.download()
+    @property
+    def mode(self) -> str:
+        """获取文件打开模式"""
+        return "r+b"  # SpooledTemporaryFile固定模式
 
-        with open(path, "wb") as f:
-            f.write(self.content)
+    @property
+    def size(self) -> int:
+        """获取当前文件大小（动态计算）"""
+        return self._size
 
-    def close(self):
-        self.content = b""
+    async def download(self, chunk_size: int = 1024 * 1024) -> None:
+        """流式下载文件到临时文件"""
+        self._check_open()
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url) as response:
+                response.raise_for_status()
+
+                # 清空已有内容
+                await self.seek(0)
+                await self.truncate(0)
+
+                # 流式写入
+                async for chunk in response.content.iter_chunked(chunk_size):
+                    await self.write(chunk)
+
+                # 重置指针
+                await self.seek(0)
+                self._size = await self._get_actual_size()
+
+    async def save(self, path: str, chunk_size: int = 1024 * 1024) -> None:
+        """异步保存文件到本地"""
+        self._check_open()
+        await self.seek(0)  # 确保从头读取
+
+        async with aiofiles.open(path, "wb") as f:
+            while True:
+                chunk = await self.read(chunk_size)
+                if not chunk:
+                    break
+                await f.write(chunk)
+
+        await self.seek(0)  # 重置指针
+
+    async def iter_chunks(self, chunk_size: int = 8192) -> AsyncGenerator[bytes, None]:
+        """异步迭代文件内容"""
+        self._check_open()
+        await self.seek(0)
+
+        while True:
+            chunk = await self.read(chunk_size)
+            if not chunk:
+                break
+            yield chunk
+
+    def _check_open(self) -> None:
+        if self.closed:
+            raise ValueError("I/O operation on closed file")
+        if self._file is None:
+            raise ValueError("File not opened in async context")
+
+    async def _get_actual_size(self) -> int:
+        """获取实际文件大小（兼容内存和磁盘模式）"""
+        current_pos = await self.tell()
+        await self.seek(0, 2)  # 移动到文件尾
+        size = await self.tell()
+        await self.seek(current_pos)  # 恢复原位置
+        return size
 
 
 class AListFolder:

@@ -27,7 +27,7 @@ classifiers = [
     "Natural Language :: Chinese (Simplified)",
 ]
 keywords = ["AList", "PythonSDK", "API"]
-dependencies = ["aiohttp"]
+dependencies = ["aiohttp", "aiofiles"]
 
 [tool.setuptools]
 packages = { find = { where = ["."] } }
