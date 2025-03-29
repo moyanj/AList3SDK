@@ -29,6 +29,13 @@ classifiers = [
 keywords = ["AList", "PythonSDK", "API"]
 dependencies = ["aiohttp", "aiofiles"]
 
+[project.optional-dependencies]
+cli = ["asyncclick", "rich"]
+
+[project.entry-points]
+console_scripts = { alist3 = "alist3.cli:cli" }
+
+
 [tool.setuptools]
 packages = { find = { where = ["."] } }
 include-package-data = true
