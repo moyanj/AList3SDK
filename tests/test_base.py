@@ -9,7 +9,7 @@ def test_error_endpoint():
 
 
 def test_is_bad_request():
-    alis = alist.AList("http")
+    alis = alist.AList("http://")
     with pytest.raises(alist.error.ServerError):
         alis._isBadRequest({"code": 400, "message": "test"}, "test")
 

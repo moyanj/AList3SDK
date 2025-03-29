@@ -39,7 +39,9 @@ class AList:
         Args:
             endpoint (str): AList地址
         """
-        if "http" not in endpoint:
+        if endpoint.startswith("http://") or endpoint.startswith("https://"):
+            pass
+        else:
             raise ValueError(f"{endpoint} 不是有效的uri")
 
         self.endpoint = endpoint  # alist地址

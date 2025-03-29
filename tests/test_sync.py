@@ -3,7 +3,7 @@ from aioresponses import aioresponses
 
 
 def test_async2sync_AList():
-    al = alist.AList("http").to_sync()
+    al = alist.AList("http://").to_sync()
     assert isinstance(al, alist.sync.AListSync)
 
 
@@ -13,7 +13,7 @@ def test_async2sync_AListFile():
 
 
 def test_sync2async_AList():
-    al = alist.sync.AListSync("http").to_async()
+    al = alist.sync.AListSync("http://").to_async()
     assert isinstance(al, alist.AList)
 
 
