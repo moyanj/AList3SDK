@@ -170,6 +170,19 @@ class AListUser:
             raw = base64.b64decode(data["raw"]).decode()
         return AListUser(un, pwd, raw)
 
+    @classmethod
+    def from_uri(cls, uri: str) -> tuple["AListUser", str]:
+        """
+        从uri加载
+        """
+        if "@" not in uri:
+            raise ValueError("Invalid URI")
+        account, endpoint = uri.split("@")
+        if ":" not in account:
+            raise ValueError("Invalid URI")
+        un, pwd = account.split(":")
+        return cls(un, pwd), endpoint
+
     def __str__(self):
         return f"AListUser({self.un})"
 

@@ -27,7 +27,7 @@ classifiers = [
     "Natural Language :: Chinese (Simplified)",
 ]
 keywords = ["AList", "PythonSDK", "API"]
-dependencies = ["aiohttp", "aiofiles"]
+dependencies = ["aiohttp", "aiofiles", "platformdirs"]
 
 [project.optional-dependencies]
 cli = ["asyncclick", "rich"]
