@@ -1,4 +1,4 @@
-from typing import Union, BinaryIO, Dict, List, Optional, AsyncGenerator
+from typing import Union, BinaryIO, Dict, List, Optional, AsyncGenerator, Tuple
 from . import error, model, utils
 import sys
 from platform import platform
@@ -11,7 +11,7 @@ try:
 except ImportError:
     import json
 
-StrNone = Union[str, None]
+StrNone = Optional[str]
 File = Union[str, model.AListFile]
 Folder = Union[str, model.AListFolder]
 Paths = Union[File, Folder]
@@ -31,8 +31,9 @@ class AList:
     endpoint: str
     headers: Dict[str, StrNone]
     token: str
+    proxy_url: StrNone
 
-    def __init__(self, endpoint: str):
+    def __init__(self, endpoint: str, proxy: StrNone=None):
         """
         初始化
 
@@ -45,6 +46,7 @@ class AList:
             raise ValueError(f"{endpoint} 不是有效的uri")
 
         self.endpoint = endpoint  # alist地址
+        self.proxy_url = proxy
         self.token = ""  # JWT Token
 
         # 构建UA
@@ -58,7 +60,7 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.3.7 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.3.8 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -74,7 +76,7 @@ class AList:
         url = urljoin(self.endpoint, path)
         if headers is None:
             headers = self.headers
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(proxy=self.proxy_url) as session:
             async with session.request(method, url, headers=headers, **kwargs) as response:  # type: ignore
                 return await response.json()
 
