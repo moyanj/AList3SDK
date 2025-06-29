@@ -1,4 +1,4 @@
-from typing import Union, BinaryIO, Dict, List, Optional, AsyncGenerator, Tuple
+from typing import Union, BinaryIO, Dict, Optional, AsyncGenerator
 from . import error, model, utils
 import sys
 from platform import platform
@@ -11,7 +11,6 @@ try:
 except ImportError:
     import json
 
-StrNone = Optional[str]
 File = Union[str, model.AListFile]
 Folder = Union[str, model.AListFolder]
 Paths = Union[File, Folder]
@@ -24,16 +23,16 @@ class AList:
 
     Attributes:
         endpoint (str): AList地址
-        headers (Dict[str, StrNone]): 全局请求头
+        headers (Dict[str, Optional[str]]): 全局请求头
         token (str): JWT Token
     """
 
     endpoint: str
-    headers: Dict[str, StrNone]
+    headers: Dict[str, Optional[str]]
     token: str
-    proxy_url: StrNone
+    proxy_url: Optional[str]
 
-    def __init__(self, endpoint: str, proxy: StrNone=None):
+    def __init__(self, endpoint: str, proxy: Optional[str] = None):
         """
         初始化
 
@@ -388,6 +387,113 @@ class AList:
         r = await self._request("GET", url, params={"id": idx})
         self._isBadRequest(r, "无法找到该元数据")
         return utils.ToClass(r).data
+
+    async def create_meta(
+        self,
+        path: str,
+        password: Optional[str],
+        p_sub: Optional[bool],
+        write: Optional[bool],
+        w_sub: Optional[bool],
+        hide: Optional[bool],
+        h_sub: Optional[bool],
+        readme: Optional[bool],
+        r_sub: Optional[bool],
+    ):
+        """
+        更新元数据
+        Args:
+            path (str): 元数据路径
+            password (Optional[str]): 密码
+            p_sub (Optional[bool]): 密码是否应用到子文件夹
+            write (Optional[bool]): 是否开启写入
+            w_sub (Optional[bool]): 开启写入是否应用到子文件夹
+            hide (Optional[bool]): 是否隐藏
+            h_sub (Optional[bool]): 隐藏是否应用到子文件夹
+            readme (Optional[bool]): 说明
+            r_sub (Optional[bool]): 说明是否应用到子文件夹
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/create"
+        data = utils.clear_dict(
+            {
+                "path": path,
+                "password": password,
+                "p_sub": p_sub,
+                "write": write,
+                "w_sub": w_sub,
+                "hide": hide,
+                "h_sub": h_sub,
+                "readme": readme,
+                "r_sub": r_sub,
+            }
+        )
+        r = await self._request("POST", url, json=data)
+        self._isBadRequest(r, "无法创建元数据")
+        return True
+
+    async def update_meta(
+        self,
+        path: str,
+        password: Optional[str],
+        p_sub: Optional[bool],
+        write: Optional[bool],
+        w_sub: Optional[bool],
+        hide: Optional[bool],
+        h_sub: Optional[bool],
+        readme: Optional[str],
+        r_sub: Optional[bool],
+    ):
+        """
+        更新元数据
+        Args:
+            path (str): 元数据路径
+            password (Optional[str]): 密码
+            p_sub (Optional[bool]): 密码是否应用到子文件夹
+            write (Optional[bool]): 是否开启写入
+            w_sub (Optional[bool]): 开启写入是否应用到子文件夹
+            hide (Optional[bool]): 是否隐藏
+            h_sub (Optional[bool]): 隐藏是否应用到子文件夹
+            readme (Optional[bool]): 说明
+            r_sub (Optional[bool]): 说明是否应用到子文件夹
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/update"
+        data = utils.clear_dict(
+            {
+                "path": path,
+                "password": password,
+                "p_sub": p_sub,
+                "write": write,
+                "w_sub": w_sub,
+                "hide": hide,
+                "h_sub": h_sub,
+                "readme": readme,
+                "r_sub": r_sub,
+            }
+        )
+        r = await self._request("POST", url, json=data)
+        self._isBadRequest(r, "无法创建元数据")
+        return True
+
+    async def delete_meta(self, idx: int) -> bool:
+        """
+        删除元数据
+
+        Args:
+            idx (int): 元数据ID
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/delete"
+        r = await self._request("POST", url, param={"id": idx})
+        self._isBadRequest(r, "无法删除元数据")
+        return True
 
     async def get_users(self) -> utils.ToClass:
         """
