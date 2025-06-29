@@ -626,6 +626,21 @@ class AList:
         self._isBadRequest(r, "无法删除用户")
         return True
 
+    async def delete_user_cache(self, username: str) -> bool:
+        """
+        删除用户缓存
+
+        Args:
+            username (str): 用户名
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/user/delete_cache"
+        r = await self._request("POST", url, param={"username": username})
+        self._isBadRequest(r, "无法删除用户缓存")
+        return True
+
     def to_sync(self):
         """
         转换为同步对象"
