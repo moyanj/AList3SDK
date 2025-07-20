@@ -1,6 +1,7 @@
 import asyncio
-from typing import Any, Optional, TypeVar, Generic, Type, get_type_hints, Union
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Generic, Optional, Type, TypeVar, Union, get_type_hints
+
 from .main import AList
 from .model import AListFile, AListFolder
 
@@ -53,7 +54,7 @@ class Sync(Generic[T]):
     def _run_async(self, coroutine) -> Any:
         """执行异步代码（自动处理事件循环上下文）"""
         try:
-            loop = asyncio.get_running_loop()
+            asyncio.get_running_loop()
             # 在已有事件循环中启动新线程执行
             with ThreadPoolExecutor(max_workers=1) as executor:
                 future = executor.submit(asyncio.run, coroutine)

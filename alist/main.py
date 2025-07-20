@@ -1,11 +1,12 @@
-from token import OP
-from typing import Union, BinaryIO, Dict, Optional, AsyncGenerator
-from . import error, model, utils
+import os
 import sys
 from platform import platform
-import os
+from typing import AsyncGenerator, BinaryIO, Dict, Optional, Union
+from urllib.parse import quote, urljoin
+
 import aiohttp
-from urllib.parse import urljoin, quote
+
+from . import error, model, utils
 
 try:
     import ujson as json
@@ -60,7 +61,7 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.3.8 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.4.1 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -708,7 +709,7 @@ class AList:
         self._isBadRequest(r, "无法删除用户缓存")
         return True
 
-    async def craete_storage(
+    async def create_storage(
         self,
         mount_path: str,
         driver: str,
@@ -723,7 +724,7 @@ class AList:
         extract_folder: Optional[str] = None,
         order_direction: str = "asc",
         enable_sign: bool = False,
-    ) -> bool:
+    ) -> int:
         """
         创建存储
 
@@ -743,7 +744,7 @@ class AList:
             enable_sign (bool, optional): 是否开启签名.
 
         Returns:
-            bool: 是否成功
+            int: 存储id
         """
         url = "/api/admin/storage/create"
         addition_str = json.dumps(addition)
@@ -764,7 +765,7 @@ class AList:
         }
         r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
         self._isBadRequest(r, "创建存储失败")
-        return True
+        return r["data"]["id"]
 
     async def update_storage(
         self,
@@ -781,7 +782,7 @@ class AList:
         extract_folder: Optional[str] = None,
         order_direction: str = "asc",
         enable_sign: bool = False,
-    ) -> bool:
+    ) -> int:
         """
         更新存储
 
@@ -801,7 +802,7 @@ class AList:
             enable_sign (bool, optional): 是否开启签名.
 
         Returns:
-            bool: 是否成功
+            int: 存储id
         """
         url = "/api/admin/storage/update"
         addition_str = json.dumps(addition)
@@ -822,7 +823,7 @@ class AList:
         }
         r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
         self._isBadRequest(r, "创建存储失败")
-        return True
+        return r["data"]["id"]
 
     async def enable_storage(self, storage_id: int):
         """
@@ -867,7 +868,7 @@ class AList:
         self._isBadRequest(r, "获取存储失败")
         return utils.ToClass(r).data
 
-    async def reload_storage(self):
+    async def reload_storage(self) -> bool:
         """
         重载存储
         """
@@ -876,7 +877,7 @@ class AList:
         self._isBadRequest(r, "重载存储失败")
         return True
 
-    async def delete_storage(self, storage_id: int):
+    async def delete_storage(self, storage_id: int) -> bool:
         """
         删除存储
         """

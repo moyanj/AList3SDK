@@ -1,6 +1,7 @@
-import aiohttp
-from typing import Mapping, Union, Any, Optional, AsyncGenerator
+from typing import Any, AsyncGenerator, Mapping, Optional, Union
+
 import aiofiles
+import aiohttp
 from aiofiles import tempfile
 
 

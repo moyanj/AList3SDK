@@ -1,6 +1,7 @@
 import pytest
-import alist
 from aioresponses import aioresponses
+
+import alist
 
 
 def test_error_endpoint():

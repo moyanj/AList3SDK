@@ -1,5 +1,6 @@
-import alist
 from aioresponses import aioresponses
+
+import alist
 
 
 def test_async2sync_AList():

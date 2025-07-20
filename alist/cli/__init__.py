@@ -1,5 +1,5 @@
-from os import name
 import asyncclick as click
+
 from . import auth
 
 

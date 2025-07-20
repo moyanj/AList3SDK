@@ -1,6 +1,7 @@
+import os
+
 from platformdirs import PlatformDirs
 from rich.console import Console
-import os
 
 _dirs = PlatformDirs("alist3")
 

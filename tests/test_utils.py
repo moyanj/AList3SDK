@@ -1,6 +1,7 @@
-import alist
 import pytest
 from aioresponses import aioresponses
+
+import alist
 
 alist_file_init = {
     "name": "Alist V3.md",

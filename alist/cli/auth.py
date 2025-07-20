@@ -1,9 +1,12 @@
-from alist import AListUser, AList
-from ._data import dirs, console
 import os
 import pickle
-from rich.table import Table
+
 from rich import box
+from rich.table import Table
+
+from alist import AList, AListUser
+
+from ._data import console, dirs
 
 
 async def add_user(uri, default, tag, cover):
