@@ -1,4 +1,5 @@
-from typing import Union, BinaryIO, Dict, List, Optional, AsyncGenerator, Tuple
+from token import OP
+from typing import Union, BinaryIO, Dict, Optional, AsyncGenerator
 from . import error, model, utils
 import sys
 from platform import platform
@@ -11,7 +12,6 @@ try:
 except ImportError:
     import json
 
-StrNone = Optional[str]
 File = Union[str, model.AListFile]
 Folder = Union[str, model.AListFolder]
 Paths = Union[File, Folder]
@@ -24,16 +24,16 @@ class AList:
 
     Attributes:
         endpoint (str): AList地址
-        headers (Dict[str, StrNone]): 全局请求头
+        headers (Dict[str, Optional[str]]): 全局请求头
         token (str): JWT Token
     """
 
     endpoint: str
-    headers: Dict[str, StrNone]
+    headers: Dict[str, Optional[str]]
     token: str
-    proxy_url: StrNone
+    proxy_url: Optional[str]
 
-    def __init__(self, endpoint: str, proxy: StrNone=None):
+    def __init__(self, endpoint: str, proxy: Optional[str] = None):
         """
         初始化
 
@@ -125,6 +125,28 @@ class AList:
         self.token = res["data"]["token"]
         self.headers["Authorization"] = f"{self.token}"
         return True
+
+    async def search_file(
+        self,
+        keywords,
+        parent: str = "",
+        scope: int = 0,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        password: str = "",
+    ) -> utils.ToClass:
+        url = "/api/fs/search"
+        data = {
+            "parent": parent,
+            "scope": scope,
+            "page": page,
+            "per_page": per_page,
+            "password": password,
+            "keywords": keywords,
+        }
+        r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
+        self._isBadRequest(r, "文件搜索失败")
+        return utils.ToClass(r).data
 
     async def user_info(self) -> utils.ToClass:
         """
@@ -263,6 +285,37 @@ class AList:
         self._isBadRequest(r, "重命名失败")
         return True
 
+    async def rename_regex(
+        self, src_dir: str, src_name_regex: str, dst_name_regex: str
+    ):
+        """
+        正则重命名
+        """
+        url = "/api/fs/regex_rename"
+        data = {
+            "src_dir": src_dir,
+            "src_name_regex": src_name_regex,
+            "dst_name_regex": dst_name_regex,
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "正则重命名失败")
+        return True
+
+    async def rename_batch(self, src_dir, src: list[File], dst: list[File]) -> bool:
+        """
+        批量重命名
+        """
+        url = "/api/fs/batch_rename"
+        data = {
+            "src_dir": src_dir,
+            "rename_object": [
+                {"src": str(src[i]), "dst": str(dst[i])} for i in range(len(src))
+            ],
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "批量重命名失败")
+        return True
+
     async def remove(self, path: File) -> bool:
         """
         删除
@@ -343,6 +396,19 @@ class AList:
         self._isBadRequest(r, "移动失败")
         return True
 
+    async def recursive_move(self, src: Folder, dstDir: Folder) -> bool:
+        """
+        递归移动文件夹
+        """
+        url = "/api/fs/recursive_move"
+        data = {
+            "src_dir": str(src),
+            "dst_dir": str(dstDir),
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "递归移动失败")
+        return True
+
     async def site_config(self) -> utils.ToClass:
         """
         获取公开站点配置
@@ -388,6 +454,113 @@ class AList:
         r = await self._request("GET", url, params={"id": idx})
         self._isBadRequest(r, "无法找到该元数据")
         return utils.ToClass(r).data
+
+    async def create_meta(
+        self,
+        path: str,
+        password: Optional[str],
+        p_sub: Optional[bool],
+        write: Optional[bool],
+        w_sub: Optional[bool],
+        hide: Optional[bool],
+        h_sub: Optional[bool],
+        readme: Optional[bool],
+        r_sub: Optional[bool],
+    ):
+        """
+        更新元数据
+        Args:
+            path (str): 元数据路径
+            password (Optional[str]): 密码
+            p_sub (Optional[bool]): 密码是否应用到子文件夹
+            write (Optional[bool]): 是否开启写入
+            w_sub (Optional[bool]): 开启写入是否应用到子文件夹
+            hide (Optional[bool]): 是否隐藏
+            h_sub (Optional[bool]): 隐藏是否应用到子文件夹
+            readme (Optional[bool]): 说明
+            r_sub (Optional[bool]): 说明是否应用到子文件夹
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/create"
+        data = utils.clear_dict(
+            {
+                "path": path,
+                "password": password,
+                "p_sub": p_sub,
+                "write": write,
+                "w_sub": w_sub,
+                "hide": hide,
+                "h_sub": h_sub,
+                "readme": readme,
+                "r_sub": r_sub,
+            }
+        )
+        r = await self._request("POST", url, json=data)
+        self._isBadRequest(r, "无法创建元数据")
+        return True
+
+    async def update_meta(
+        self,
+        path: str,
+        password: Optional[str],
+        p_sub: Optional[bool],
+        write: Optional[bool],
+        w_sub: Optional[bool],
+        hide: Optional[bool],
+        h_sub: Optional[bool],
+        readme: Optional[str],
+        r_sub: Optional[bool],
+    ):
+        """
+        更新元数据
+        Args:
+            path (str): 元数据路径
+            password (Optional[str]): 密码
+            p_sub (Optional[bool]): 密码是否应用到子文件夹
+            write (Optional[bool]): 是否开启写入
+            w_sub (Optional[bool]): 开启写入是否应用到子文件夹
+            hide (Optional[bool]): 是否隐藏
+            h_sub (Optional[bool]): 隐藏是否应用到子文件夹
+            readme (Optional[bool]): 说明
+            r_sub (Optional[bool]): 说明是否应用到子文件夹
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/update"
+        data = utils.clear_dict(
+            {
+                "path": path,
+                "password": password,
+                "p_sub": p_sub,
+                "write": write,
+                "w_sub": w_sub,
+                "hide": hide,
+                "h_sub": h_sub,
+                "readme": readme,
+                "r_sub": r_sub,
+            }
+        )
+        r = await self._request("POST", url, json=data)
+        self._isBadRequest(r, "无法创建元数据")
+        return True
+
+    async def delete_meta(self, idx: int) -> bool:
+        """
+        删除元数据
+
+        Args:
+            idx (int): 元数据ID
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/meta/delete"
+        r = await self._request("POST", url, param={"id": idx})
+        self._isBadRequest(r, "无法删除元数据")
+        return True
 
     async def get_users(self) -> utils.ToClass:
         """
@@ -519,6 +692,250 @@ class AList:
         r = await self._request("POST", url, data=json.dumps({"id": idx}))
         self._isBadRequest(r, "无法删除用户")
         return True
+
+    async def delete_user_cache(self, username: str) -> bool:
+        """
+        删除用户缓存
+
+        Args:
+            username (str): 用户名
+
+        Returns:
+            (bool): 是否成功
+        """
+        url = "/api/admin/user/delete_cache"
+        r = await self._request("POST", url, param={"username": username})
+        self._isBadRequest(r, "无法删除用户缓存")
+        return True
+
+    async def craete_storage(
+        self,
+        mount_path: str,
+        driver: str,
+        addition: dict,
+        order: int = 0,
+        remark: str = "",
+        cache_expires: Optional[int] = None,
+        web_proxy: bool = False,
+        webdav_policy: str = "native_proxy",
+        down_proxy_url: Optional[str] = None,
+        order_by: str = "name",
+        extract_folder: Optional[str] = None,
+        order_direction: str = "asc",
+        enable_sign: bool = False,
+    ) -> bool:
+        """
+        创建存储
+
+        Args:
+            mount_path (str): 挂载路径
+            driver (str): 驱动
+            addition (dict): 额外参数
+            order (int, optional): 排序. Defaults to 0.
+            remark (str, optional): 备注.
+            cache_expires (int, optional): 缓存过期时间.
+            web_proxy (bool, optional): 是否开启web代理.
+            webdav_policy (str, optional): webdav策略.
+            down_proxy_url (str, optional): 下载代理地址.
+            order_by (str, optional): 排序字段.
+            extract_folder (str, optional): 解压文件夹.
+            order_direction (str, optional): 排序方向.
+            enable_sign (bool, optional): 是否开启签名.
+
+        Returns:
+            bool: 是否成功
+        """
+        url = "/api/admin/storage/create"
+        addition_str = json.dumps(addition)
+        data = {
+            "mount_path": mount_path,
+            "driver": driver,
+            "addition": addition_str,
+            "order": order,
+            "remark": remark,
+            "cache_expires": cache_expires,
+            "web_proxy": web_proxy,
+            "webdav_policy": webdav_policy,
+            "down_proxy_url": down_proxy_url,
+            "order_by": order_by,
+            "extract_folder": extract_folder,
+            "order_direction": order_direction,
+            "enable_sign": enable_sign,
+        }
+        r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
+        self._isBadRequest(r, "创建存储失败")
+        return True
+
+    async def update_storage(
+        self,
+        mount_path: Optional[str] = None,
+        driver: Optional[str] = None,
+        addition: Optional[dict] = None,
+        order: int = 0,
+        remark: str = "",
+        cache_expires: Optional[int] = None,
+        web_proxy: bool = False,
+        webdav_policy: str = "native_proxy",
+        down_proxy_url: Optional[str] = None,
+        order_by: str = "name",
+        extract_folder: Optional[str] = None,
+        order_direction: str = "asc",
+        enable_sign: bool = False,
+    ) -> bool:
+        """
+        更新存储
+
+        Args:
+            mount_path (str, optional): 挂载路径
+            driver (str, optional): 驱动
+            addition (dict, optional): 额外参数
+            order (int, optional): 排序. Defaults to 0.
+            remark (str, optional): 备注.
+            cache_expires (int, optional): 缓存过期时间.
+            web_proxy (bool, optional): 是否开启web代理.
+            webdav_policy (str, optional): webdav策略.
+            down_proxy_url (str, optional): 下载代理地址.
+            order_by (str, optional): 排序字段.
+            extract_folder (str, optional): 解压文件夹.
+            order_direction (str, optional): 排序方向.
+            enable_sign (bool, optional): 是否开启签名.
+
+        Returns:
+            bool: 是否成功
+        """
+        url = "/api/admin/storage/update"
+        addition_str = json.dumps(addition)
+        data = {
+            "mount_path": mount_path,
+            "driver": driver,
+            "addition": addition_str,
+            "order": order,
+            "remark": remark,
+            "cache_expires": cache_expires,
+            "web_proxy": web_proxy,
+            "webdav_policy": webdav_policy,
+            "down_proxy_url": down_proxy_url,
+            "order_by": order_by,
+            "extract_folder": extract_folder,
+            "order_direction": order_direction,
+            "enable_sign": enable_sign,
+        }
+        r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
+        self._isBadRequest(r, "创建存储失败")
+        return True
+
+    async def enable_storage(self, storage_id: int):
+        """
+        启用存储
+        """
+        url = "/api/admin/storage/enable"
+        r = await self._request("POST", url, data={"id": storage_id})
+        self._isBadRequest(r, "启用存储失败")
+        return True
+
+    async def disable_storage(self, storage_id: int):
+        """
+        禁用存储
+        """
+        url = "/api/admin/storage/disable"
+        r = await self._request("POST", url, data={"id": storage_id})
+        self._isBadRequest(r, "禁用存储失败")
+        return True
+
+    async def list_storages(
+        self, page: Optional[int] = None, per_page: Optional[int] = None
+    ):
+        """
+        获取存储列表
+        """
+        url = "/api/admin/storage/list"
+        r = await self._request(
+            "GET", url, params=utils.clear_dict({"page": page, "per_page": per_page})
+        )
+        self._isBadRequest(r, "获取存储列表失败")
+        return utils.ToClass(r).data
+
+    async def get_storage(self, storage_id: int):
+        """
+        获取存储
+
+        Args:
+            storage_id (str): 存储ID
+        """
+        url = "/api/admin/storage/get"
+        r = await self._request("GET", url, params={"id": storage_id})
+        self._isBadRequest(r, "获取存储失败")
+        return utils.ToClass(r).data
+
+    async def reload_storage(self):
+        """
+        重载存储
+        """
+        url = "/api/admin/storage/load_all"
+        r = await self._request("POST", url)
+        self._isBadRequest(r, "重载存储失败")
+        return True
+
+    async def delete_storage(self, storage_id: int):
+        """
+        删除存储
+        """
+        url = "/api/admin/storage/delete"
+        r = await self._request("POST", url, params={"id": storage_id})
+        self._isBadRequest(r, "删除存储失败")
+        return True
+
+    async def list_driver(self):
+        """
+        获取驱动列表
+        """
+        url = "/api/admin/driver/list"
+        r = await self._request("GET", url)
+        self._isBadRequest(r, "获取驱动列表失败")
+        return utils.ToClass(r).data
+
+    async def list_driver_names(self):
+        """
+        获取驱动名称列表
+        """
+        url = "/api/admin/driver/names"
+        r = await self._request("GET", url)
+        self._isBadRequest(r, "获取驱动名称列表失败")
+        return utils.ToClass(r).data
+
+    async def get_driver_info(self, driver_name: str):
+        """
+        获取驱动信息
+        """
+        url = "/api/admin/driver/info"
+        r = await self._request("GET", url, params={"name": driver_name})
+        self._isBadRequest(r, "获取驱动信息失败")
+        return utils.ToClass(r).data
+
+    async def add_offline_download(
+        self,
+        urls: list[str],
+        path: str,
+        tool: str = "SimpleHttp",
+        delete_policy: str = "delete_on_upload_succeed",
+    ):
+        """
+        添加离线下载
+        """
+        url = "/api/fs/add_offline_download"
+        data = {
+            "urls": urls,
+            "path": path,
+            "tool": tool,
+            "delete_policy": delete_policy,
+        }
+        r = await self._request(
+            "POST",
+            url,
+            data=json.dumps(data),
+        )
+        self._isBadRequest(r, "添加离线下载失败")
+        return utils.ToClass(r).data
 
     def to_sync(self):
         """
