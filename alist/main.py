@@ -285,6 +285,37 @@ class AList:
         self._isBadRequest(r, "重命名失败")
         return True
 
+    async def rename_regex(
+        self, src_dir: str, src_name_regex: str, dst_name_regex: str
+    ):
+        """
+        正则重命名
+        """
+        url = "/api/fs/regex_rename"
+        data = {
+            "src_dir": src_dir,
+            "src_name_regex": src_name_regex,
+            "dst_name_regex": dst_name_regex,
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "正则重命名失败")
+        return True
+
+    async def rename_batch(self, src_dir, src: list[File], dst: list[File]) -> bool:
+        """
+        批量重命名
+        """
+        url = "/api/fs/batch_rename"
+        data = {
+            "src_dir": src_dir,
+            "rename_object": [
+                {"src": str(src[i]), "dst": str(dst[i])} for i in range(len(src))
+            ],
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "批量重命名失败")
+        return True
+
     async def remove(self, path: File) -> bool:
         """
         删除
@@ -363,6 +394,19 @@ class AList:
         )
         r = await self._request("POST", "/api/fs/move", data=data)
         self._isBadRequest(r, "移动失败")
+        return True
+
+    async def recursive_move(self, src: Folder, dstDir: Folder) -> bool:
+        """
+        递归移动文件夹
+        """
+        url = "/api/fs/recursive_move"
+        data = {
+            "src_dir": str(src),
+            "dst_dir": str(dstDir),
+        }
+        r = await self._request("POST", url, data=json.dumps(data))
+        self._isBadRequest(r, "递归移动失败")
         return True
 
     async def site_config(self) -> utils.ToClass:
