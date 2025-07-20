@@ -126,6 +126,28 @@ class AList:
         self.headers["Authorization"] = f"{self.token}"
         return True
 
+    async def search_file(
+        self,
+        keywords,
+        parent: str = "",
+        scope: int = 0,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        password: str = "",
+    ) -> utils.ToClass:
+        url = "/api/fs/search"
+        data = {
+            "parent": parent,
+            "scope": scope,
+            "page": page,
+            "per_page": per_page,
+            "password": password,
+            "keywords": keywords,
+        }
+        r = await self._request("POST", url, data=json.dumps(utils.clear_dict(data)))
+        self._isBadRequest(r, "文件搜索失败")
+        return utils.ToClass(r).data
+
     async def user_info(self) -> utils.ToClass:
         """
         获取当前登录的用户的信息
@@ -844,6 +866,31 @@ class AList:
         url = "/api/admin/driver/info"
         r = await self._request("GET", url, params={"name": driver_name})
         self._isBadRequest(r, "获取驱动信息失败")
+        return utils.ToClass(r).data
+
+    async def add_offline_download(
+        self,
+        urls: list[str],
+        path: str,
+        tool: str = "SimpleHttp",
+        delete_policy: str = "delete_on_upload_succeed",
+    ):
+        """
+        添加离线下载
+        """
+        url = "/api/fs/add_offline_download"
+        data = {
+            "urls": urls,
+            "path": path,
+            "tool": tool,
+            "delete_policy": delete_policy,
+        }
+        r = await self._request(
+            "POST",
+            url,
+            data=json.dumps(data),
+        )
+        self._isBadRequest(r, "添加离线下载失败")
         return utils.ToClass(r).data
 
     def to_sync(self):
