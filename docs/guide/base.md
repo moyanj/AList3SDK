@@ -20,7 +20,7 @@ async def main():
     await client.login(user)
     
     # 列出指定目录下的文件
-    res = await client.list_dir("/test")
+    res = client.list_dir("/test")
     
     # 打印目录内容
     async for item in res:
