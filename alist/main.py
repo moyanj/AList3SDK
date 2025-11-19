@@ -127,6 +127,15 @@ class AList:
         self.headers["Authorization"] = f"{self.token}"
         return True
 
+    async def logout(self) -> bool:
+        """
+        注销登录
+        """
+        await self._request("GET", "/api/auth/logout")
+        self.token = ""
+        self.headers["Authorization"] = None
+        return True
+
     async def search_file(
         self,
         keywords,
@@ -158,6 +167,17 @@ class AList:
         """
         r = await self._request("GET", "/api/me")
         return utils.ToClass(r).data
+
+    async def list_my_ssh_keys(self) -> AsyncGenerator[utils.ToClass, None]:
+        """
+        列出当前用户的 SSH 密钥
+        """
+        r = await self._request("GET", "/api/me/sshkey/list")
+        self._isBadRequest(r, "无法获取SSH密钥列表")
+        if r["data"] is None:
+            return
+        for i in r["data"]:
+            yield utils.ToClass(i)
 
     async def list_dir(
         self,
@@ -705,7 +725,7 @@ class AList:
             (bool): 是否成功
         """
         url = "/api/admin/user/delete_cache"
-        r = await self._request("POST", url, param={"username": username})
+        r = await self._request("POST", url, params={"username": username})
         self._isBadRequest(r, "无法删除用户缓存")
         return True
 

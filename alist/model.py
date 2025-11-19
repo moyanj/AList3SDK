@@ -50,7 +50,7 @@ class AListFile:
         if self._closed:
             raise ValueError("Cannot reopen closed file")
         self._file = await tempfile.SpooledTemporaryFile(
-            max_size=10 * 1024 * 1024
+            max_size=10 * 1024 * 1024  # 10MB
         ).__aenter__()
         await self.download()
         return self
