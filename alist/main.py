@@ -559,7 +559,7 @@ class AList:
             (bool): 是否成功
         """
         url = "/api/admin/meta/delete"
-        r = await self._request("POST", url, param={"id": idx})
+        r = await self._request("POST", url, params={"id": idx})
         self._isBadRequest(r, "无法删除元数据")
         return True
 
