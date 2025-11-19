@@ -28,10 +28,10 @@ classifiers = [
     "Natural Language :: Chinese (Simplified)",
 ]
 keywords = ["AList", "PythonSDK", "API"]
-dependencies = ["aiohttp", "aiofiles", "platformdirs"]
+dependencies = ["aiohttp", "aiofiles"]
 
 [project.optional-dependencies]
-cli = ["asyncclick", "rich"]
+cli = ["asyncclick", "rich", "platformdirs"]
 
 [project.entry-points]
 console_scripts = { alist3 = "alist3.cli:cli" }
