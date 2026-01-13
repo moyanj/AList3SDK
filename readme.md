@@ -7,7 +7,7 @@
 [![Documentation Status](https://readthedocs.org/projects/alist3sdk/badge/?version=latest)](https://alist3sdk.readthedocs.io/zh-cn/latest/?badge=latest)
 
 [!WARNING]
-本SDK默认API已切换为异步API,若需要使用同步API,请使用`AListSync`和`AListAdminSync`，或安装`1.3.2`及以下的版本
+本SDK目前遵循的API文档为[OpenList](https://github.com/OpenListTeam/OpenList)，暂未对可能的其他分支进行适配
 
 AList3SDK 是一个高性能的 Python SDK，用于与 OpenList/AList 服务轻松交互 🚀。它支持异步和同步 API ⚡，并提供完善的类型注解 📝，让开发更高效！
 
