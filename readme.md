@@ -9,7 +9,7 @@
 [!WARNING]
 本SDK默认API已切换为异步API,若需要使用同步API,请使用`AListSync`和`AListAdminSync`，或安装`1.3.2`及以下的版本
 
-AList3SDK 是一个高性能的 Python SDK，用于与 AList 服务轻松交互 🚀。它支持异步和同步 API ⚡，并提供完善的类型注解 📝，让开发更高效！
+AList3SDK 是一个高性能的 Python SDK，用于与 OpenList/AList 服务轻松交互 🚀。它支持异步和同步 API ⚡，并提供完善的类型注解 📝，让开发更高效！
 
 ## 安装
 
@@ -21,7 +21,7 @@ pip install alist3
 
 ## 快速开始
 
-使用 AList3SDK，您可以轻松地与 AList 服务进行交互。以下是一个快速示例：
+使用 AList3SDK，您可以轻松地与 OpenList/AList 服务进行交互。以下是一个快速示例：
 
 ```python
 import asyncio
@@ -59,7 +59,7 @@ asyncio.run(main())
 
 Q: 如果遇到身份验证问题应该怎么办？
 
-A: 请确保您的 AList地址和账号密码正确，并具有足够的权限。
+A: 请确保您的 OpenList 地址和账号密码正确，并具有足够的权限。
 
 ## 贡献指南
 
