@@ -21,7 +21,7 @@ class AListFile:
         raw (dict): 原始返回信息
     """
 
-    def __init__(self, path: str, init: Mapping[str, Any]):
+    def __init__(self, path: str, init: Mapping[str, Any], proxy: Optional[str] = None):
         # 初始化元数据
         self.path = path
         self.name = init.get("name", "")
@@ -32,10 +32,12 @@ class AListFile:
         self.url = init.get("raw_url", "")
         self.sign = str(init.get("sign", ""))
         self.raw = init
+        self.proxy = proxy
 
         # 文件操作相关
         self._file = None
         self._closed = False
+        self._downloaded = False
 
     def __len__(self) -> int:
         return self._size

@@ -61,7 +61,7 @@ class AList:
         pf = platform().split("-")
 
         self.headers = {
-            "User-Agent": f"AListSDK/1.4.2 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
+            "User-Agent": f"AListSDK/1.5.0 (Python{ver};{pf[3]}) {pf[0]}/{pf[1]}",
             "Content-Type": "application/json",
             "Authorization": "",
         }
@@ -78,7 +78,9 @@ class AList:
         if headers is None:
             headers = self.headers
         async with aiohttp.ClientSession(proxy=self.proxy_url) as session:
-            async with session.request(method, url, headers=headers, **kwargs) as response:  # type: ignore
+            async with session.request(
+                method, url, headers=headers, **kwargs
+            ) as response:  # type: ignore
                 return await response.json()
 
     async def test(self) -> bool:
@@ -213,11 +215,8 @@ class AList:
         self._isBadRequest(r, "获取失败")
 
         for item in r["data"]["content"]:
-            i = {
-                "path": os.path.join(str(path), item["name"]),
-                "is_dir": item["is_dir"],
-            }
-            yield utils.ToClass(i)
+            item["path"] = os.path.join(str(path), item["name"])
+            yield utils.ToClass(item)
 
     async def open(self, path: Paths, password: str = "") -> ALFS:
         """

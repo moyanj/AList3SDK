@@ -14,12 +14,14 @@ nav:
   - 指引: 
     - "guide/start.md"
     - "guide/base.md"
+    - "guide/cli.md"
   - API参考: 
     - "apis/main.md"
     - "apis/model.md"
     - "apis/sync.md"
     - "apis/utils.md"
     - "apis/error.md"
+    - "apis/cli.md"
   - 示例:
     - "examples/first.md"
     

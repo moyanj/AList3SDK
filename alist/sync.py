@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Generic, Optional, Type, TypeVar, Union, get_type_hints
 
@@ -38,12 +39,25 @@ class Sync(Generic[T]):
         attr = getattr(self._async_obj, name)
 
         # 自动包装协程方法
-        if asyncio.iscoroutinefunction(attr):
+        if inspect.iscoroutinefunction(attr):
 
             def sync_wrapper(*args, **kwargs):
                 return self._run_async(attr(*args, **kwargs))
 
             return sync_wrapper
+
+        # 自动包装异步生成器
+        if inspect.isasyncgenfunction(attr):
+
+            def sync_gen_wrapper(*args, **kwargs):
+                gen = attr(*args, **kwargs)
+                while True:
+                    try:
+                        yield self._run_async(gen.__anext__())
+                    except StopAsyncIteration:
+                        break
+
+            return sync_gen_wrapper
 
         # 处理异步属性（如 @property 修饰的协程）
         if isinstance(attr, property) and asyncio.iscoroutinefunction(attr.fget):
