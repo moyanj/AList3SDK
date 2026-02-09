@@ -8,3 +8,6 @@ pytest
 pytest-asyncio
 aioresponses
 aiofiles
+asyncclick
+rich
+platformdirs
